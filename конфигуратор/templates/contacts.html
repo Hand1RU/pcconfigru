@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Контакты - PC Configurator</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background:#0b0b0b;
+    color:#eee;
+}
+
+/* HEADER */
+header{
+    background:#111;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #1f1f1f;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(17, 17, 17, 0.95);
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    background: linear-gradient(45deg, #00eaff, #00ff9c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+nav a{
+    margin-left:25px;
+    color:#bbb;
+    text-decoration:none;
+    transition: all 0.3s;
+    position: relative;
+}
+
+nav a:hover{
+    color:#00eaff;
+}
+
+nav a.active {
+    color: #00eaff;
+}
+
+nav a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #00eaff;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #00eaff;
+    transition: width 0.3s;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* HERO */
+.page-hero{
+    text-align:center;
+    padding:60px 20px;
+    background: radial-gradient(circle at 50% 0%, #1a2a2a, #0b0b0b);
+}
+
+.page-hero h1{
+    font-size:48px;
+    margin-bottom:20px;
+    background: linear-gradient(135deg, #fff, #00eaff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-hero p{
+    color:#aaa;
+    font-size:18px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* CONTAINER */
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+/* CONTACT GRID */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+/* CONTACT INFO */
+.contact-info {
+    background: #111;
+    border-radius: 30px;
+    padding: 40px;
+    border: 1px solid #1f1f1f;
+}
+
+.contact-info h2 {
+    color: #00eaff;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+
+.contact-item:hover {
+    transform: translateX(10px);
+    border-left: 4px solid #00eaff;
+}
+
+.contact-icon {
+    width: 50px;
+    height: 50px;
+    background: #00eaff20;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #00eaff;
+}
+
+.contact-details h3 {
+    margin: 0 0 5px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.contact-details p {
+    margin: 5px 0;
+    color: #888;
+    font-size: 16px;
+}
+
+.contact-details a {
+    color: #00eaff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.contact-details a:hover {
+    color: #00ffff;
+}
+
+/* CONTACT FORM */
+.contact-form {
+    background: #111;
+    border-radius: 30px;
+    padding: 40px;
+    border: 1px solid #1f1f1f;
+}
+
+.contact-form h2 {
+    color: #00eaff;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #aaa;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 15px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #00eaff;
+    box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(45deg, #00eaff, #00ff9c);
+    border: none;
+    border-radius: 30px;
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(0, 234, 255, 0.3);
+}
+
+/* SOCIAL SECTION */
+.social-section {
+    text-align: center;
+    margin-top: 60px;
+}
+
+.social-section h2 {
+    color: #00eaff;
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.social-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.social-card {
+    width: 80px;
+    height: 80px;
+    background: #1a1a1a;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: #888;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 1px solid #2a2a2a;
+}
+
+.social-card:hover {
+    transform: translateY(-5px);
+    border-color: #00eaff;
+    color: #00eaff;
+    box-shadow: 0 5px 20px rgba(0, 234, 255, 0.2);
+}
+
+/* FAQ SECTION */
+.faq-section {
+    margin-top: 60px;
+}
+
+.faq-section h2 {
+    color: #00eaff;
+    font-size: 32px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.faq-item {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid #2a2a2a;
+    transition: all 0.3s;
+}
+
+.faq-item:hover {
+    border-color: #00eaff;
+    transform: translateY(-2px);
+}
+
+.faq-item h3 {
+    color: #00eaff;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.faq-item p {
+    color: #aaa;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* MAP SECTION */
+.map-section {
+    margin-top: 60px;
+    background: #111;
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid #1f1f1f;
+}
+
+.map-section h2 {
+    color: #00eaff;
+    margin: 30px 30px 0;
+    font-size: 28px;
+}
+
+.map-container {
+    height: 400px;
+    margin-top: 20px;
+}
+
+.map-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 18px;
+}
+
+/* TEAM SECTION */
+.team-section {
+    margin-top: 60px;
+}
+
+.team-section h2 {
+    color: #00eaff;
+    font-size: 32px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.team-card {
+    background: #111;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #1f1f1f;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.team-card:hover {
+    transform: translateY(-5px);
+    border-color: #00eaff;
+}
+
+.team-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #00eaff20;
+    margin: 30px auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #00eaff;
+    border: 2px solid #00eaff;
+}
+
+.team-card h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 20px;
+}
+
+.team-role {
+    color: #00eaff;
+    font-size: 14px;
+    margin: 5px 0 15px;
+}
+
+.team-card p {
+    color: #888;
+    padding: 0 20px 30px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* FOOTER */
+footer{
+    margin-top:80px;
+    padding:40px;
+    text-align:center;
+    color:#666;
+    border-top:1px solid #1f1f1f;
+    background: #111;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.footer-links a {
+    color: #888;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #00eaff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .faq-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .page-hero h1 {
+        font-size: 36px;
+    }
+}
+
+/* SUCCESS MESSAGE */
+.success-message {
+    background: #00ff9c20;
+    border: 1px solid #00ff9c;
+    color: #00ff9c;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.success-message.show {
+    display: block;
+}
+
+/* ERROR MESSAGE */
+.error-message {
+    background: #ff6b6b20;
+    border: 1px solid #ff6b6b;
+    color: #ff6b6b;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">
+⚡ PC CONFIG
+</div>
+<nav>
+<a href="/">Главная</a>
+<a href="/configurator">Конфигуратор</a>
+<a href="/sborki">Сборки</a>
+<a href="/contacts" class="active">Контакты</a>
+</nav>
+</header>
+
+<section class="page-hero">
+<h1>Свяжитесь с нами</h1>
+<p>Мы всегда готовы помочь с выбором комплектующих и ответить на вопросы</p>
+</section>
+
+<div class="container">
+    <div class="contact-grid">
+        <!-- Контактная информация -->
+        <div class="contact-info">
+            <h2>Контакты</h2>
+            
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div class="contact-details">
+                    <h3>Адрес</h3>
+                    <p>г. Москва, ул. Тверская, д. 7</p>
+                    <p>БЦ "Галактика", офис 502</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div class="contact-details">
+                    <h3>Телефон</h3>
+                    <p><a href="tel:+79523406787">+7 (952) 340-67-87</a></p>
+                    <p>Ежедневно с 10:00 до 20:00</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div class="contact-details">
+                    <h3>Email</h3>
+                    <p><a href="mailto:hand24653100@gmail.com">hand24653100@gmail.com</a></p>
+                    <p>Ответ в течение 2 часов</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <div class="contact-icon">💬</div>
+                <div class="contact-details">
+                    <h3>Мессенджеры</h3>
+                    <p>Telegram: @pcconfig_bot</p>
+                    <p>WhatsApp: +7 (952) 340-67-87</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Форма обратной связи -->
+        <div class="contact-form">
+            <h2>Напишите нам</h2>
+            
+            <div class="success-message" id="successMessage">
+                ✅ Сообщение отправлено! Мы ответим в ближайшее время.
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                ❌ Ошибка отправки. Попробуйте позже.
+            </div>
+            
+            <form id="contactForm" onsubmit="submitForm(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Имя *</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон</label>
+                        <input type="tel" id="phone" placeholder="+7 (___) ___-__-__">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Тема *</label>
+                        <select id="subject" required>
+                            <option value="">Выберите тему</option>
+                            <option value="consultation">Консультация по сборке</option>
+                            <option value="compatibility">Проверка совместимости</option>
+                            <option value="price">Вопрос по ценам</option>
+                            <option value="support">Техподдержка</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Сообщение *</label>
+                    <textarea id="message" required placeholder="Опишите ваш вопрос или пожелания..."></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn">Отправить сообщение</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Социальные сети -->
+    <div class="social-section">
+        <h2>Мы в соцсетях</h2>
+        <div class="social-grid">
+            <a href="#" class="social-card">📘</a>
+            <a href="#" class="social-card">📷</a>
+            <a href="#" class="social-card">🐦</a>
+            <a href="#" class="social-card">💬</a>
+            <a href="#" class="social-card">▶️</a>
+            <a href="#" class="social-card">👾</a>
+        </div>
+    </div>
+    
+    <!-- Команда -->
+    <div class="team-section">
+        <h2>Наша команда</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">👨‍💻</div>
+                <h3>Алексей Петров</h3>
+                <div class="team-role">Основатель</div>
+                <p>Собирает ПК с 2010 года. Специализация — игровые сборки и разгон.</p>
+            </div>
+            
+            <div class="team-card">
+                <div class="team-avatar">👩‍💻</div>
+                <h3>Екатерина Смирнова</h3>
+                <div class="team-role">Инженер-сборщик</div>
+                <p>Отвечает за тестирование совместимости и оптимизацию сборок.</p>
+            </div>
+            
+            <div class="team-card">
+                <div class="team-avatar">👨‍🔧</div>
+                <h3>Дмитрий Иванов</h3>
+                <div class="team-role">Техподдержка</div>
+                <p>Помогает с выбором комплектующих и отвечает на вопросы.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Часто задаваемые вопросы -->
+    <div class="faq-section">
+        <h2>Часто задаваемые вопросы</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>Как проверить совместимость?</h3>
+                <p>Наш конфигуратор автоматически проверяет совместимость всех компонентов. Просто выбирайте комплектующие, и система покажет только совместимые варианты.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Можно ли изменить сборку?</h3>
+                <p>Да, в конфигураторе вы можете менять любые компоненты. Цена пересчитывается автоматически при каждом изменении.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Как долго собираете?</h3>
+                <p>Сборка компьютера занимает 1-2 дня. Срочная сборка возможна за 24 часа.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Даете гарантию?</h3>
+                <p>Да, на все комплектующие гарантия от производителя. На сборку — 1 год.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Доставка по России?</h3>
+                <p>Да, отправляем в любой город транспортными компаниями. Стоимость от 500₽.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Можно приехать к вам?</h3>
+                <p>Да, мы находимся в Москве на Тверской. Предварительно запишитесь по телефону.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Карта -->
+    <div class="map-section">
+        <h2>Как нас найти</h2>
+        <div class="map-container">
+            <div class="map-placeholder">
+                🗺️ Здесь будет карта с адресом (можно вставить iframe от Яндекс.Карт или Google Maps)
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>© 2026 PC Configurator — собери свой идеальный ПК</div>
+    <div class="footer-links">
+        <a href="#">О проекте</a>
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Помощь</a>
+        <a href="/contacts">Контакты</a>
+    </div>
+</footer>
+
+<script>
+// Обработка формы
+function submitForm(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const email = document.getElementById('email').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    
+    // Валидация
+    if (!name || !email || !subject || !message) {
+        showError('Заполните все обязательные поля');
+        return;
+    }
+    
+    if (!isValidEmail(email)) {
+        showError('Введите корректный email');
+        return;
+    }
+    
+    // Здесь можно отправить данные на сервер
+    console.log('Form submitted:', { name, phone, email, subject, message });
+    
+    // Показываем успех
+    showSuccess();
+    
+    // Очищаем форму
+    document.getElementById('contactForm').reset();
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function showSuccess() {
+    const successMsg = document.getElementById('successMessage');
+    successMsg.classList.add('show');
+    setTimeout(() => {
+        successMsg.classList.remove('show');
+    }, 5000);
+}
+
+function showError(text) {
+    const errorMsg = document.getElementById('errorMessage');
+    errorMsg.textContent = '❌ ' + text;
+    errorMsg.classList.add('show');
+    setTimeout(() => {
+        errorMsg.classList.remove('show');
+    }, 5000);
+}
+
+// Маска для телефона
+document.getElementById('phone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 0) {
+        if (value.length <= 1) {
+            value = '+7' + value;
+        } else if (value.length <= 4) {
+            value = '+7 (' + value.substring(1, 4);
+        } else if (value.length <= 7) {
+            value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7);
+        } else if (value.length <= 9) {
+            value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9);
+        } else {
+            value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9) + '-' + value.substring(9, 11);
+        }
+        e.target.value = value;
+    }
+});
+</script>
+
+</body>
+</html>

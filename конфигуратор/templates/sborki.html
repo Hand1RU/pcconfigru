@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Готовые сборки ПК - PC Configurator</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background:#0b0b0b;
+    color:#eee;
+}
+
+/* HEADER */
+header{
+    background:#111;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #1f1f1f;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(17, 17, 17, 0.95);
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    background: linear-gradient(45deg, #00eaff, #00ff9c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+nav a{
+    margin-left:25px;
+    color:#bbb;
+    text-decoration:none;
+    transition: all 0.3s;
+    position: relative;
+}
+
+nav a:hover{
+    color:#00eaff;
+}
+
+nav a.active {
+    color: #00eaff;
+}
+
+nav a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #00eaff;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #00eaff;
+    transition: width 0.3s;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* HERO */
+.page-hero{
+    text-align:center;
+    padding:60px 20px;
+    background: radial-gradient(circle at 50% 0%, #1a2a2a, #0b0b0b);
+}
+
+.page-hero h1{
+    font-size:48px;
+    margin-bottom:20px;
+    background: linear-gradient(135deg, #fff, #00eaff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-hero p{
+    color:#aaa;
+    font-size:18px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* FILTERS */
+.filters {
+    max-width: 1200px;
+    margin: 40px auto 20px;
+    padding: 0 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-btn {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #aaa;
+    padding: 12px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.filter-btn:hover {
+    border-color: #00eaff;
+    color: #00eaff;
+}
+
+.filter-btn.active {
+    background: #00eaff;
+    color: black;
+    border-color: #00eaff;
+}
+
+/* BUILDS GRID */
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.builds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* BUILD CARD */
+.build-card {
+    background: #111;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid #1f1f1f;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.build-card:hover {
+    transform: translateY(-5px);
+    border-color: #00eaff;
+    box-shadow: 0 10px 30px rgba(0, 234, 255, 0.2);
+}
+
+.build-card-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #1a1a1a, #111);
+    border-bottom: 1px solid #1f1f1f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.build-card-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #00eaff;
+}
+
+.build-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-gaming {
+    background: #00eaff20;
+    color: #00eaff;
+}
+
+.badge-work {
+    background: #00ff9c20;
+    color: #00ff9c;
+}
+
+.badge-stream {
+    background: #ff6b6b20;
+    color: #ff6b6b;
+}
+
+.build-card-content {
+    padding: 20px;
+}
+
+.build-specs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.build-specs-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #1f1f1f;
+    font-size: 14px;
+}
+
+.build-specs-list li:last-child {
+    border-bottom: none;
+}
+
+.spec-label {
+    color: #888;
+}
+
+.spec-value {
+    color: #fff;
+    font-weight: 500;
+}
+
+.gpu-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.gpu-nvidia {
+    background: #76b90020;
+    color: #76b900;
+}
+
+.gpu-amd {
+    background: #ed1c2420;
+    color: #ff6b6b;
+}
+
+.build-card-footer {
+    padding: 20px;
+    border-top: 1px solid #1f1f1f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0a0a0a;
+}
+
+.build-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ff9c;
+}
+
+.build-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.build-btn {
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.build-btn-primary {
+    background: #00eaff;
+    color: black;
+}
+
+.build-btn-primary:hover {
+    background: #00ffff;
+    transform: scale(1.05);
+}
+
+.build-btn-secondary {
+    background: transparent;
+    border: 1px solid #00eaff;
+    color: #00eaff;
+}
+
+.build-btn-secondary:hover {
+    background: #00eaff20;
+    transform: scale(1.05);
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    overflow-y: auto;
+    backdrop-filter: blur(5px);
+}
+
+.modal.active {
+    display: block;
+}
+
+.modal-content {
+    max-width: 1000px;
+    margin: 50px auto;
+    background: #111;
+    border-radius: 30px;
+    border: 1px solid #333;
+    overflow: hidden;
+    animation: modalSlide 0.3s ease;
+}
+
+@keyframes modalSlide {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 30px;
+    background: linear-gradient(135deg, #1a1a1a, #111);
+    border-bottom: 1px solid #1f1f1f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 32px;
+    background: linear-gradient(135deg, #fff, #00eaff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 40px;
+    cursor: pointer;
+    transition: color 0.3s;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #00eaff;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+/* DETAILED BUILD */
+.build-detailed {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.build-detailed-section {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.build-detailed-section h3 {
+    color: #00eaff;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.component-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.component-item:last-child {
+    border-bottom: none;
+}
+
+.component-name {
+    color: #fff;
+    font-weight: 500;
+}
+
+.component-price {
+    color: #00ff9c;
+    font-weight: bold;
+}
+
+.build-total {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #1a2a2a, #1a1a1a);
+    border-radius: 20px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.build-total-label {
+    font-size: 24px;
+    color: #fff;
+}
+
+.build-total-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: #00ff9c;
+}
+
+.build-warnings {
+    grid-column: span 2;
+    background: #2a1a1a;
+    border-radius: 20px;
+    padding: 20px;
+    border-left: 4px solid #ff6b6b;
+}
+
+.build-warnings p {
+    margin: 5px 0;
+    color: #ff6b6b;
+    font-size: 14px;
+}
+
+.build-performance {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.performance-card {
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+}
+
+.performance-card h4 {
+    color: #888;
+    margin: 0 0 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.performance-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #00eaff;
+    margin-bottom: 5px;
+}
+
+.performance-desc {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.modal-footer {
+    padding: 30px;
+    border-top: 1px solid #1f1f1f;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    background: #0a0a0a;
+}
+
+.modal-footer .build-btn {
+    padding: 15px 40px;
+    font-size: 16px;
+}
+
+/* FOOTER */
+footer{
+    margin-top:80px;
+    padding:40px;
+    text-align:center;
+    color:#666;
+    border-top:1px solid #1f1f1f;
+    background: #111;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.footer-links a {
+    color: #888;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #00eaff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .builds-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .build-detailed {
+        grid-template-columns: 1fr;
+    }
+    
+    .build-total {
+        grid-column: span 1;
+    }
+    
+    .build-warnings {
+        grid-column: span 1;
+    }
+    
+    .build-performance {
+        grid-column: span 1;
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-header h2 {
+        font-size: 24px;
+    }
+}
+
+/* LOADING */
+.loading {
+    text-align: center;
+    padding: 100px;
+    color: #888;
+}
+
+.loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    border: 2px solid #00eaff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">
+⚡ PC CONFIG
+</div>
+<nav>
+<a href="/">Главная</a>
+<a href="/configurator">Конфигуратор</a>
+<a href="/sborki" class="active">Сборки</a>
+<a href="/contacts">Контакты</a>
+</nav>
+</header>
+
+<section class="page-hero">
+<h1>Готовые сборки ПК</h1>
+<p>Проверенные конфигурации для любых задач — от игр до работы</p>
+</section>
+
+<div class="filters">
+    <button class="filter-btn active" data-filter="all">Все сборки</button>
+    <button class="filter-btn" data-filter="gaming">Игровые</button>
+    <button class="filter-btn" data-filter="work">Для работы</button>
+    <button class="filter-btn" data-filter="stream">Стриминг</button>
+    <button class="filter-btn" data-filter="nvidia">NVIDIA</button>
+    <button class="filter-btn" data-filter="amd">AMD</button>
+    <button class="filter-btn" data-filter="budget">До 100к</button>
+    <button class="filter-btn" data-filter="medium">100-200к</button>
+    <button class="filter-btn" data-filter="ultra">200к+</button>
+</div>
+
+<div class="container">
+    <div class="builds-grid" id="buildsGrid">
+        <!-- Сборки будут загружаться сюда -->
+        <div class="loading">Загрузка сборок</div>
+    </div>
+</div>
+
+<!-- Модальное окно для детального просмотра -->
+<div class="modal" id="buildModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Название сборки</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Контент будет загружаться сюда -->
+        </div>
+        <div class="modal-footer">
+            <button class="build-btn build-btn-secondary" onclick="closeModal()">Закрыть</button>
+            <a href="/configurator" class="build-btn build-btn-primary" id="modalEditBtn">Редактировать в конфигураторе</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>© 2026 PC Configurator — собери свой идеальный ПК</div>
+    <div class="footer-links">
+        <a href="#">О проекте</a>
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Помощь</a>
+        <a href="#">Контакты</a>
+    </div>
+</footer>
+
+<script>
+// База данных сборок
+const builds = [
+    // NVIDIA 30 SERIES
+    {
+        id: 'rtx3060',
+        name: 'GeForce RTX 3060',
+        category: ['gaming', 'budget', 'nvidia'],
+        badge: 'gaming',
+        badgeText: 'Игровой',
+        price: 85000,
+        image: '',
+        specs: {
+            cpu: 'Intel Core i5-12400',
+            gpu: 'RTX 3060 12GB GDDR6',
+            ram: 'DDR4 16GB 3200MHz',
+            storage: 'SSD 500GB NVMe',
+            motherboard: 'MSI B660M-A DDR4',
+            psu: '600W Bronze',
+            case: 'NZXT H510',
+            cooling: 'Воздушное Cooler Master'
+        },
+        detailed: {
+            cpu: { name: 'Intel Core i5-12400', price: 18000 },
+            gpu: { name: 'RTX 3060 12GB GDDR6', price: 35000 },
+            ram: { name: 'DDR4 16GB 3200MHz', price: 8000 },
+            storage: { name: 'SSD 500GB NVMe', price: 8000 },
+            motherboard: { name: 'MSI B660M-A DDR4', price: 5000 },
+            psu: { name: '600W Bronze', price: 5000 },
+            case: { name: 'NZXT H510', price: 7000 },
+            cooling: { name: 'Воздушное Cooler Master', price: 2500 }
+        },
+        performance: {
+            fps_1080p: '60-80',
+            fps_1440p: '40-50',
+            fps_4k: '20-30',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: []
+    },
+    {
+        id: 'rtx3070ti',
+        name: 'GeForce RTX 3070 Ti',
+        category: ['gaming', 'medium', 'nvidia'],
+        badge: 'gaming',
+        badgeText: 'Игровой',
+        price: 120000,
+        specs: {
+            cpu: 'AMD Ryzen 7 5700X',
+            gpu: 'RTX 3070 Ti 8GB GDDR6X',
+            ram: 'DDR4 32GB 3600MHz',
+            storage: 'SSD 1TB NVMe',
+            motherboard: 'ASUS TUF B550M-PLUS',
+            psu: '750W Gold',
+            case: 'Corsair 4000D',
+            cooling: 'Воздушное Noctua'
+        },
+        detailed: {
+            cpu: { name: 'AMD Ryzen 7 5700X', price: 14000 },
+            gpu: { name: 'RTX 3070 Ti 8GB GDDR6X', price: 67400 },
+            ram: { name: 'DDR4 32GB 3600MHz', price: 18500 },
+            storage: { name: 'SSD 1TB NVMe', price: 13000 },
+            motherboard: { name: 'ASUS TUF B550M-PLUS', price: 6500 },
+            psu: { name: '750W Gold', price: 8000 },
+            case: { name: 'Corsair 4000D', price: 9000 },
+            cooling: { name: 'Воздушное Noctua', price: 4000 }
+        },
+        performance: {
+            fps_1080p: '100-120',
+            fps_1440p: '70-90',
+            fps_4k: '40-50',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: []
+    },
+    {
+        id: 'rtx3090',
+        name: 'GeForce RTX 3090',
+        category: ['gaming', 'ultra', 'nvidia', 'stream'],
+        badge: 'stream',
+        badgeText: 'Для стримов',
+        price: 250000,
+        specs: {
+            cpu: 'Intel Core i9-12900',
+            gpu: 'RTX 3090 24GB GDDR6X',
+            ram: 'DDR4 64GB 3200MHz',
+            storage: 'SSD 2TB NVMe',
+            motherboard: 'ASUS ROG Z790-E',
+            psu: '850W Gold',
+            case: 'Lian Li O11',
+            cooling: 'Жидкостное 360mm'
+        },
+        detailed: {
+            cpu: { name: 'Intel Core i9-12900', price: 39000 },
+            gpu: { name: 'RTX 3090 24GB GDDR6X', price: 180000 },
+            ram: { name: 'DDR4 64GB 3200MHz', price: 40000 },
+            storage: { name: 'SSD 2TB NVMe', price: 21000 },
+            motherboard: { name: 'ASUS ROG Z790-E', price: 50000 },
+            psu: { name: '850W Gold', price: 10000 },
+            case: { name: 'Lian Li O11', price: 12000 },
+            cooling: { name: 'Жидкостное 360mm', price: 12000 }
+        },
+        performance: {
+            fps_1080p: '140-160',
+            fps_1440p: '110-130',
+            fps_4k: '70-90',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: ['Требуется хорошая вентиляция корпуса']
+    },
+    
+    // NVIDIA 40 SERIES
+    {
+        id: 'rtx4060',
+        name: 'GeForce RTX 4060',
+        category: ['gaming', 'budget', 'nvidia'],
+        badge: 'gaming',
+        badgeText: 'Игровой',
+        price: 95000,
+        specs: {
+            cpu: 'AMD Ryzen 5 7600',
+            gpu: 'RTX 4060 8GB GDDR6',
+            ram: 'DDR5 16GB 5200MHz',
+            storage: 'SSD 1TB NVMe',
+            motherboard: 'MSI B650 Tomahawk',
+            psu: '600W Bronze',
+            case: 'NZXT H510',
+            cooling: 'Воздушное Cooler Master'
+        },
+        detailed: {
+            cpu: { name: 'AMD Ryzen 5 7600', price: 15000 },
+            gpu: { name: 'RTX 4060 8GB GDDR6', price: 45000 },
+            ram: { name: 'DDR5 16GB 5200MHz', price: 25000 },
+            storage: { name: 'SSD 1TB NVMe', price: 13000 },
+            motherboard: { name: 'MSI B650 Tomahawk', price: 12500 },
+            psu: { name: '600W Bronze', price: 5000 },
+            case: { name: 'NZXT H510', price: 7000 },
+            cooling: { name: 'Воздушное Cooler Master', price: 2500 }
+        },
+        performance: {
+            fps_1080p: '80-100',
+            fps_1440p: '50-60',
+            fps_4k: '25-35',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: []
+    },
+    {
+        id: 'rtx4070',
+        name: 'GeForce RTX 4070',
+        category: ['gaming', 'medium', 'nvidia'],
+        badge: 'gaming',
+        badgeText: 'Игровой',
+        price: 155000,
+        specs: {
+            cpu: 'Intel Core i5-14600K',
+            gpu: 'RTX 4070 12GB GDDR6X',
+            ram: 'DDR5 32GB 5600MHz',
+            storage: 'SSD 1TB NVMe',
+            motherboard: 'MSI B760',
+            psu: '750W Gold',
+            case: 'Corsair 4000D',
+            cooling: 'Жидкостное 240mm'
+        },
+        detailed: {
+            cpu: { name: 'Intel Core i5-14600K', price: 28000 },
+            gpu: { name: 'RTX 4070 12GB GDDR6X', price: 70000 },
+            ram: { name: 'DDR5 32GB 5600MHz', price: 52000 },
+            storage: { name: 'SSD 1TB NVMe', price: 13000 },
+            motherboard: { name: 'MSI B760', price: 13500 },
+            psu: { name: '750W Gold', price: 8000 },
+            case: { name: 'Corsair 4000D', price: 9000 },
+            cooling: { name: 'Жидкостное 240mm', price: 8000 }
+        },
+        performance: {
+            fps_1080p: '120-140',
+            fps_1440p: '90-110',
+            fps_4k: '50-60',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: []
+    },
+    {
+        id: 'rtx4090',
+        name: 'GeForce RTX 4090',
+        category: ['gaming', 'ultra', 'nvidia', 'stream'],
+        badge: 'stream',
+        badgeText: 'Для стримов',
+        price: 350000,
+        specs: {
+            cpu: 'Intel Core i9-14900K',
+            gpu: 'RTX 4090 24GB GDDR6X',
+            ram: 'DDR5 64GB 6000MHz',
+            storage: 'SSD 2TB NVMe',
+            motherboard: 'ASUS ROG Z790',
+            psu: '1000W Gold',
+            case: 'Lian Li O11',
+            cooling: 'Жидкостное 360mm'
+        },
+        detailed: {
+            cpu: { name: 'Intel Core i9-14900K', price: 48000 },
+            gpu: { name: 'RTX 4090 24GB GDDR6X', price: 250000 },
+            ram: { name: 'DDR5 64GB 6000MHz', price: 64000 },
+            storage: { name: 'SSD 2TB NVMe', price: 21000 },
+            motherboard: { name: 'ASUS ROG Z790', price: 50000 },
+            psu: { name: '1000W Gold', price: 15000 },
+            case: { name: 'Lian Li O11', price: 12000 },
+            cooling: { name: 'Жидкостное 360mm', price: 12000 }
+        },
+        performance: {
+            fps_1080p: '200+',
+            fps_1440p: '160-180',
+            fps_4k: '100-120',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: ['Требуется очень мощный БП', 'Нужен большой корпус']
+    },
+    
+    // AMD SERIES
+    {
+        id: 'rx6600xt',
+        name: 'Radeon RX 6600 XT',
+        category: ['gaming', 'budget', 'amd'],
+        badge: 'gaming',
+        badgeText: 'Игровой',
+        price: 75000,
+        specs: {
+            cpu: 'AMD Ryzen 5 5600',
+            gpu: 'RX 6600 XT 8GB GDDR6',
+            ram: 'DDR4 16GB 3200MHz',
+            storage: 'SSD 500GB NVMe',
+            motherboard: 'MSI B550M',
+            psu: '600W Bronze',
+            case: 'NZXT H510',
+            cooling: 'Воздушное Cooler Master'
+        },
+        detailed: {
+            cpu: { name: 'AMD Ryzen 5 5600', price: 10000 },
+            gpu: { name: 'RX 6600 XT 8GB GDDR6', price: 35000 },
+            ram: { name: 'DDR4 16GB 3200MHz', price: 8000 },
+            storage: { name: 'SSD 500GB NVMe', price: 8000 },
+            motherboard: { name: 'MSI B550M', price: 5400 },
+            psu: { name: '600W Bronze', price: 5000 },
+            case: { name: 'NZXT H510', price: 7000 },
+            cooling: { name: 'Воздушное Cooler Master', price: 2500 }
+        },
+        performance: {
+            fps_1080p: '70-90',
+            fps_1440p: '45-55',
+            fps_4k: '25-30',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: []
+    },
+    {
+        id: 'rx6700xt',
+        name: 'Radeon RX 6700 XT',
+        category: ['gaming', 'medium', 'amd'],
+        badge: 'gaming',
+        badgeText: 'Игровой',
+        price: 100000,
+        specs: {
+            cpu: 'AMD Ryzen 7 5700X',
+            gpu: 'RX 6700 XT 12GB GDDR6',
+            ram: 'DDR4 32GB 3600MHz',
+            storage: 'SSD 1TB NVMe',
+            motherboard: 'ASUS TUF B550M',
+            psu: '750W Gold',
+            case: 'Corsair 4000D',
+            cooling: 'Воздушное Noctua'
+        },
+        detailed: {
+            cpu: { name: 'AMD Ryzen 7 5700X', price: 14000 },
+            gpu: { name: 'RX 6700 XT 12GB GDDR6', price: 55000 },
+            ram: { name: 'DDR4 32GB 3600MHz', price: 18500 },
+            storage: { name: 'SSD 1TB NVMe', price: 13000 },
+            motherboard: { name: 'ASUS TUF B550M', price: 6500 },
+            psu: { name: '750W Gold', price: 8000 },
+            case: { name: 'Corsair 4000D', price: 9000 },
+            cooling: { name: 'Воздушное Noctua', price: 4000 }
+        },
+        performance: {
+            fps_1080p: '90-110',
+            fps_1440p: '60-70',
+            fps_4k: '35-40',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: []
+    },
+    {
+        id: 'rx7900xtx',
+        name: 'Radeon RX 7900 XTX',
+        category: ['gaming', 'ultra', 'amd', 'stream'],
+        badge: 'stream',
+        badgeText: 'Для стримов',
+        price: 210000,
+        specs: {
+            cpu: 'AMD Ryzen 9 7950X',
+            gpu: 'RX 7900 XTX 24GB GDDR6',
+            ram: 'DDR5 64GB 6000MHz',
+            storage: 'SSD 2TB NVMe',
+            motherboard: 'ASUS ROG X670E',
+            psu: '850W Gold',
+            case: 'Lian Li O11',
+            cooling: 'Жидкостное 360mm'
+        },
+        detailed: {
+            cpu: { name: 'AMD Ryzen 9 7950X', price: 58000 },
+            gpu: { name: 'RX 7900 XTX 24GB GDDR6', price: 150000 },
+            ram: { name: 'DDR5 64GB 6000MHz', price: 64000 },
+            storage: { name: 'SSD 2TB NVMe', price: 21000 },
+            motherboard: { name: 'ASUS ROG X670E', price: 58000 },
+            psu: { name: '850W Gold', price: 10000 },
+            case: { name: 'Lian Li O11', price: 12000 },
+            cooling: { name: 'Жидкостное 360mm', price: 12000 }
+        },
+        performance: {
+            fps_1080p: '150-170',
+            fps_1440p: '120-140',
+            fps_4k: '80-90',
+            games: 'Cyberpunk 2077, Warzone, Fortnite'
+        },
+        warnings: ['Требуется хорошее охлаждение']
+    },
+    
+    // РАБОЧИЕ СТАНЦИИ
+    {
+        id: 'workstation',
+        name: 'Рабочая станция',
+        category: ['work', 'medium'],
+        badge: 'work',
+        badgeText: 'Для работы',
+        price: 120000,
+        specs: {
+            cpu: 'AMD Ryzen 9 5900X',
+            gpu: 'RTX 3060 12GB',
+            ram: 'DDR4 64GB 3200MHz',
+            storage: 'SSD 1TB NVMe + HDD 2TB',
+            motherboard: 'MSI B550',
+            psu: '750W Gold',
+            case: 'Corsair 4000D',
+            cooling: 'Воздушное Noctua'
+        },
+        detailed: {
+            cpu: { name: 'AMD Ryzen 9 5900X', price: 22000 },
+            gpu: { name: 'RTX 3060 12GB', price: 35000 },
+            ram: { name: 'DDR4 64GB 3200MHz', price: 40000 },
+            storage: { name: 'SSD 1TB NVMe + HDD 2TB', price: 18000 },
+            motherboard: { name: 'MSI B550', price: 5400 },
+            psu: { name: '750W Gold', price: 8000 },
+            case: { name: 'Corsair 4000D', price: 9000 },
+            cooling: { name: 'Воздушное Noctua', price: 4000 }
+        },
+        performance: {
+            fps_1080p: 'N/A',
+            fps_1440p: 'N/A',
+            fps_4k: 'N/A',
+            games: 'Для работы с видео, 3D, рендеринг'
+        },
+        warnings: []
+    }
+];
+
+// Загрузка сборок
+function loadBuilds(filter = 'all') {
+    const grid = document.getElementById('buildsGrid');
+    
+    let filteredBuilds = builds;
+    if (filter !== 'all') {
+        filteredBuilds = builds.filter(b => b.category.includes(filter));
+    }
+    
+    if (filteredBuilds.length === 0) {
+        grid.innerHTML = '<div style="text-align: center; padding: 100px; color: #888;">Сборки не найдены</div>';
+        return;
+    }
+    
+    grid.innerHTML = filteredBuilds.map(build => `
+        <div class="build-card" data-id="${build.id}">
+            <div class="build-card-header">
+                <h3>${build.name}</h3>
+                <span class="build-badge badge-${build.badge}">${build.badgeText}</span>
+            </div>
+            <div class="build-card-content">
+                <ul class="build-specs-list">
+                    <li><span class="spec-label">Процессор</span><span class="spec-value">${build.specs.cpu}</span></li>
+                    <li><span class="spec-label">Видеокарта</span><span class="spec-value">${build.specs.gpu}</span></li>
+                    <li><span class="spec-label">Память</span><span class="spec-value">${build.specs.ram}</span></li>
+                    <li><span class="spec-label">Накопитель</span><span class="spec-value">${build.specs.storage}</span></li>
+                </ul>
+            </div>
+            <div class="build-card-footer">
+                <span class="build-price">≈ ${build.price.toLocaleString()} ₽</span>
+                <div class="build-actions">
+                    <button class="build-btn build-btn-secondary" onclick="showBuildDetails('${build.id}')">Подробнее</button>
+                    <a href="/configurator?build=${build.id}" class="build-btn build-btn-primary">Собрать</a>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Показать детали сборки
+function showBuildDetails(buildId) {
+    const build = builds.find(b => b.id === buildId);
+    if (!build) return;
+    
+    const modal = document.getElementById('buildModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalEditBtn = document.getElementById('modalEditBtn');
+    
+    modalTitle.textContent = build.name;
+    modalEditBtn.href = `/configurator?build=${build.id}`;
+    
+    // Считаем общую сумму
+    const total = Object.values(build.detailed).reduce((sum, item) => sum + item.price, 0);
+    
+    modalBody.innerHTML = `
+        <div class="build-detailed">
+            <div class="build-detailed-section">
+                <h3>Основные компоненты</h3>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.cpu.name}</span>
+                    <span class="component-price">${build.detailed.cpu.price.toLocaleString()} ₽</span>
+                </div>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.gpu.name}</span>
+                    <span class="component-price">${build.detailed.gpu.price.toLocaleString()} ₽</span>
+                </div>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.motherboard.name}</span>
+                    <span class="component-price">${build.detailed.motherboard.price.toLocaleString()} ₽</span>
+                </div>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.ram.name}</span>
+                    <span class="component-price">${build.detailed.ram.price.toLocaleString()} ₽</span>
+                </div>
+            </div>
+            
+            <div class="build-detailed-section">
+                <h3>Остальные компоненты</h3>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.storage.name}</span>
+                    <span class="component-price">${build.detailed.storage.price.toLocaleString()} ₽</span>
+                </div>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.psu.name}</span>
+                    <span class="component-price">${build.detailed.psu.price.toLocaleString()} ₽</span>
+                </div>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.case.name}</span>
+                    <span class="component-price">${build.detailed.case.price.toLocaleString()} ₽</span>
+                </div>
+                <div class="component-item">
+                    <span class="component-name">${build.detailed.cooling.name}</span>
+                    <span class="component-price">${build.detailed.cooling.price.toLocaleString()} ₽</span>
+                </div>
+            </div>
+            
+            <div class="build-total">
+                <span class="build-total-label">Итого:</span>
+                <span class="build-total-value">${total.toLocaleString()} ₽</span>
+            </div>
+            
+            ${build.warnings.length > 0 ? `
+                <div class="build-warnings">
+                    ${build.warnings.map(w => `<p>⚠️ ${w}</p>`).join('')}
+                </div>
+            ` : ''}
+            
+            <div class="build-performance">
+                <div class="performance-card">
+                    <h4>1080p</h4>
+                    <div class="performance-value">${build.performance.fps_1080p}</div>
+                    <div class="performance-desc">FPS в играх</div>
+                </div>
+                <div class="performance-card">
+                    <h4>1440p</h4>
+                    <div class="performance-value">${build.performance.fps_1440p}</div>
+                    <div class="performance-desc">FPS в играх</div>
+                </div>
+                <div class="performance-card">
+                    <h4>4K</h4>
+                    <div class="performance-value">${build.performance.fps_4k}</div>
+                    <div class="performance-desc">FPS в играх</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Закрыть модальное окно
+function closeModal() {
+    const modal = document.getElementById('buildModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Фильтрация
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadBuilds(btn.dataset.filter);
+    });
+});
+
+// Закрытие по клику вне модалки
+document.getElementById('buildModal').addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        closeModal();
+    }
+});
+
+// Закрытие по ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+
+// Загрузка при старте
+loadBuilds();
+</script>
+
+</body>
+</html>

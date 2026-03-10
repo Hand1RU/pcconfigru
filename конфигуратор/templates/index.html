@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Configurator - Собери свой идеальный ПК</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+body{
+    margin:0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background:#0b0b0b;
+    color:#eee;
+}
+
+/* HEADER */
+
+header{
+    background:#111;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #1f1f1f;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(17, 17, 17, 0.95);
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    background: linear-gradient(45deg, #00eaff, #00ff9c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+nav a{
+    margin-left:25px;
+    color:#bbb;
+    text-decoration:none;
+    transition: all 0.3s;
+    position: relative;
+}
+
+nav a:hover{
+    color:#00eaff;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #00eaff;
+    transition: width 0.3s;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* HERO */
+
+.hero{
+    text-align:center;
+    padding:100px 20px;
+    background: radial-gradient(circle at 50% 0%, #1a2a2a, #0b0b0b);
+}
+
+.hero h1{
+    font-size:52px;
+    margin-bottom:20px;
+    background: linear-gradient(135deg, #fff, #00eaff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero p{
+    color:#aaa;
+    font-size:18px;
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+/* КНОПКА - СУПЕР КРАСИВАЯ */
+
+.hero .button {
+    display: inline-block;
+    background: linear-gradient(45deg, #00eaff, #00ff9c);
+    border: none;
+    padding: 16px 40px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: #000;
+    box-shadow: 0 5px 20px rgba(0, 234, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.hero .button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+    z-index: -1;
+}
+
+.hero .button:hover::before {
+    left: 100%;
+}
+
+.hero .button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 234, 255, 0.5);
+}
+
+.hero .button:active {
+    transform: translateY(0) scale(1);
+}
+
+/* СТАТИСТИКА */
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 50px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: #00eaff;
+}
+
+.stat-label {
+    color: #888;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* CARDS */
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #00eaff, #00ff9c);
+    border-radius: 3px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:30px;
+}
+
+.card{
+    background:#151515;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.6);
+    transition:0.3s;
+    border: 1px solid #1f1f1f;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(0, 234, 255, 0.03), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+}
+
+.card:hover::before {
+    transform: translateX(100%);
+}
+
+.card:hover{
+    box-shadow:0 0 30px rgba(0,234,255,0.2);
+    transform: translateY(-5px);
+    border-color: #00eaff;
+}
+
+.card h3{
+    margin-top:0;
+    font-size: 22px;
+    color: #00eaff;
+}
+
+.card p{
+    color:#aaa;
+    line-height: 1.6;
+}
+
+/* FEATURES */
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.feature {
+    text-align: center;
+    padding: 30px;
+    background: #111;
+    border-radius: 20px;
+    border: 1px solid #1f1f1f;
+    transition: all 0.3s;
+}
+
+.feature:hover {
+    border-color: #00eaff;
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.feature h3 {
+    color: #00eaff;
+    margin-bottom: 10px;
+}
+
+.feature p {
+    color: #888;
+    line-height: 1.6;
+}
+
+/* COMING SOON */
+
+.coming-soon {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.coming-item {
+    background: #111;
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.coming-item::before {
+    content: 'СКОРО';
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    background: #00eaff;
+    color: black;
+    padding: 5px 30px;
+    font-size: 12px;
+    font-weight: bold;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.coming-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+    opacity: 0.7;
+}
+
+.coming-item h3 {
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.coming-item p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* POPULAR BUILDS */
+
+.popular-builds {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.build-card {
+    background: #111;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid #1f1f1f;
+    transition: all 0.3s;
+}
+
+.build-card:hover {
+    border-color: #00eaff;
+    transform: translateY(-5px);
+}
+
+.build-card h3 {
+    color: #00eaff;
+    margin-bottom: 15px;
+}
+
+.build-specs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.build-specs li {
+    color: #aaa;
+    padding: 5px 0;
+    border-bottom: 1px solid #1f1f1f;
+    font-size: 14px;
+}
+
+.build-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ff9c;
+    margin-bottom: 15px;
+}
+
+.build-button {
+    display: inline-block;
+    background: transparent;
+    border: 2px solid #00eaff;
+    color: #00eaff;
+    padding: 10px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.build-button:hover {
+    background: #00eaff;
+    color: black;
+}
+
+/* GPU BADGE */
+
+.gpu-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.gpu-nvidia {
+    background: #76b90020;
+    color: #76b900;
+}
+
+.gpu-amd {
+    background: #ed1c2420;
+    color: #ff6b6b;
+}
+
+/* FOOTER */
+
+footer{
+    margin-top:80px;
+    padding:40px;
+    text-align:center;
+    color:#666;
+    border-top:1px solid #1f1f1f;
+    background: #111;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.footer-links a {
+    color: #888;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #00eaff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 36px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .features,
+    .popular-builds,
+    .coming-soon {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+⚡ PC CONFIG
+</div>
+
+<nav>
+    <a href="/">Главная</a>
+    <a href="/configurator">Конфигуратор</a>
+    <a href="/sborki">Сборки</a>
+    <a href="/contacts">Контакты</a>
+</nav>
+
+</header>
+
+
+<section class="hero">
+
+<h1>Собери свой идеальный ПК</h1>
+
+<p>
+Онлайн конфигуратор с автоматической проверкой совместимости,
+актуальными ценами и тысячами готовых сборок
+</p>
+
+<a class="button" href="/configurator">
+    🚀 Начать сборку
+</a>
+
+<div class="stats">
+    <div class="stat-item">
+        <div class="stat-number">127</div>
+        <div class="stat-label">КОМПЛЕКТУЮЩИХ</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">19</div>
+        <div class="stat-label">ГОТОВЫХ СБОРОК</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">ПОДДЕРЖКА</div>
+    </div>
+</div>
+
+</section>
+
+
+<div class="container">
+
+<h2 class="section-title">Почему выбирают нас</h2>
+
+<div class="features">
+
+<div class="feature">
+    <div class="feature-icon">🔧</div>
+    <h3>Умная совместимость</h3>
+    <p>Мгновенная проверка всех компонентов: сокеты, чипсеты, версии BIOS, TDP, частота RAM и многое другое</p>
+</div>
+
+<div class="feature">
+    <div class="feature-icon">⚡</div>
+    <h3>Оптимальные сборки</h3>
+    <p>Готовые конфигурации для игр, работы и стриминга от профессиональных сборщиков</p>
+</div>
+
+<div class="feature">
+    <div class="feature-icon">💾</div>
+    <h3>Сохранение сборок</h3>
+    <p>Сохраняйте свои конфигурации, делитесь с друзьями и возвращайтесь к ним позже</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<h2 class="section-title">Совсем скоро</h2>
+
+<div class="coming-soon">
+
+<div class="coming-item">
+    <div class="coming-icon">💰</div>
+    <h3>Актуальные цены</h3>
+    <p>Цены из 5 крупнейших магазинов в реальном времени</p>
+</div>
+
+<div class="coming-item">
+    <div class="coming-icon">📊</div>
+    <h3>Сравнение</h3>
+    <p>Сравнивайте комплектующие по характеристикам и цене</p>
+</div>
+
+<div class="coming-item">
+    <div class="coming-icon">🎮</div>
+    <h3>Тесты FPS</h3>
+    <p>Примерная производительность в популярных играх</p>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="container">
+
+<h2 class="section-title">Популярные готовые сборки</h2>
+
+<div class="popular-builds">
+
+<!-- NVIDIA 30 SERIES -->
+<div class="build-card">
+    <h3>🎮 GeForce RTX 3060 <span class="gpu-badge gpu-nvidia">RTX 30</span></h3>
+    <ul class="build-specs">
+        <li>Intel Core i5-12400</li>
+        <li>RTX 3060 12GB GDDR6</li>
+        <li>DDR4 16GB 3200MHz</li>
+        <li>SSD 500GB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 85 000 ₽</div>
+    <a href="/configurator?build=rtx3060" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>⚡ GeForce RTX 3070 Ti <span class="gpu-badge gpu-nvidia">RTX 30</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 7 5700X</li>
+        <li>RTX 3070 Ti 8GB GDDR6X</li>
+        <li>DDR4 32GB 3600MHz</li>
+        <li>SSD 1TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 120 000 ₽</div>
+    <a href="/configurator?build=rtx3070ti" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>💎 GeForce RTX 3090 <span class="gpu-badge gpu-nvidia">RTX 30</span></h3>
+    <ul class="build-specs">
+        <li>Intel Core i9-12900</li>
+        <li>RTX 3090 24GB GDDR6X</li>
+        <li>DDR4 64GB 3200MHz</li>
+        <li>SSD 2TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 250 000 ₽</div>
+    <a href="/configurator?build=rtx3090" class="build-button">Собрать</a>
+</div>
+
+<!-- NVIDIA 40 SERIES -->
+<div class="build-card">
+    <h3>🚀 GeForce RTX 4060 <span class="gpu-badge gpu-nvidia">RTX 40</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 5 7600</li>
+        <li>RTX 4060 8GB GDDR6</li>
+        <li>DDR5 16GB 5200MHz</li>
+        <li>SSD 1TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 95 000 ₽</div>
+    <a href="/configurator?build=rtx4060" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>🔥 GeForce RTX 4070 <span class="gpu-badge gpu-nvidia">RTX 40</span></h3>
+    <ul class="build-specs">
+        <li>Intel Core i5-14600K</li>
+        <li>RTX 4070 12GB GDDR6X</li>
+        <li>DDR5 32GB 5600MHz</li>
+        <li>SSD 1TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 155 000 ₽</div>
+    <a href="/configurator?build=rtx4070" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>👑 GeForce RTX 4090 <span class="gpu-badge gpu-nvidia">RTX 40</span></h3>
+    <ul class="build-specs">
+        <li>Intel Core i9-14900K</li>
+        <li>RTX 4090 24GB GDDR6X</li>
+        <li>DDR5 64GB 6000MHz</li>
+        <li>SSD 2TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 350 000 ₽</div>
+    <a href="/configurator?build=rtx4090" class="build-button">Собрать</a>
+</div>
+
+<!-- NVIDIA 50 SERIES -->
+<div class="build-card">
+    <h3>✨ GeForce RTX 5060 Ti <span class="gpu-badge gpu-nvidia">RTX 50</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 7 7800X3D</li>
+        <li>RTX 5060 Ti 16GB GDDR7</li>
+        <li>DDR5 32GB 6000MHz</li>
+        <li>SSD 1TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 135 000 ₽</div>
+    <a href="/configurator?build=rtx5060ti" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>🌟 GeForce RTX 5080 <span class="gpu-badge gpu-nvidia">RTX 50</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 9 7950X3D</li>
+        <li>RTX 5080 16GB GDDR7</li>
+        <li>DDR5 64GB 6000MHz</li>
+        <li>SSD 2TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 230 000 ₽</div>
+    <a href="/configurator?build=rtx5080" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>💫 GeForce RTX 5090 <span class="gpu-badge gpu-nvidia">RTX 50</span></h3>
+    <ul class="build-specs">
+        <li>Intel Core Ultra 9 285K</li>
+        <li>RTX 5090 32GB GDDR7</li>
+        <li>DDR5 64GB 6400MHz</li>
+        <li>SSD 2TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 480 000 ₽</div>
+    <a href="/configurator?build=rtx5090" class="build-button">Собрать</a>
+</div>
+
+<!-- AMD SERIES -->
+<div class="build-card">
+    <h3>🔴 Radeon RX 6600 XT <span class="gpu-badge gpu-amd">AMD</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 5 5600</li>
+        <li>RX 6600 XT 8GB GDDR6</li>
+        <li>DDR4 16GB 3200MHz</li>
+        <li>SSD 500GB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 75 000 ₽</div>
+    <a href="/configurator?build=rx6600xt" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>🔴 Radeon RX 6700 XT <span class="gpu-badge gpu-amd">AMD</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 7 5700X</li>
+        <li>RX 6700 XT 12GB GDDR6</li>
+        <li>DDR4 32GB 3600MHz</li>
+        <li>SSD 1TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 100 000 ₽</div>
+    <a href="/configurator?build=rx6700xt" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>🔴 Radeon RX 6800 XT <span class="gpu-badge gpu-amd">AMD</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 9 5900X</li>
+        <li>RX 6800 XT 16GB GDDR6</li>
+        <li>DDR4 32GB 3600MHz</li>
+        <li>SSD 1TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 135 000 ₽</div>
+    <a href="/configurator?build=rx6800xt" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>🔴 Radeon RX 7600 <span class="gpu-badge gpu-amd">AMD</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 5 7600</li>
+        <li>RX 7600 8GB GDDR6</li>
+        <li>DDR5 16GB 5200MHz</li>
+        <li>SSD 500GB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 90 000 ₽</div>
+    <a href="/configurator?build=rx7600" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>🔴 Radeon RX 7700 XT <span class="gpu-badge gpu-amd">AMD</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 7 7700</li>
+        <li>RX 7700 XT 12GB GDDR6</li>
+        <li>DDR5 32GB 6000MHz</li>
+        <li>SSD 1TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 125 000 ₽</div>
+    <a href="/configurator?build=rx7700xt" class="build-button">Собрать</a>
+</div>
+
+<div class="build-card">
+    <h3>🔴 Radeon RX 7900 XTX <span class="gpu-badge gpu-amd">AMD</span></h3>
+    <ul class="build-specs">
+        <li>AMD Ryzen 9 7950X</li>
+        <li>RX 7900 XTX 24GB GDDR6</li>
+        <li>DDR5 64GB 6000MHz</li>
+        <li>SSD 2TB NVMe</li>
+    </ul>
+    <div class="build-price">≈ 210 000 ₽</div>
+    <a href="/configurator?build=rx7900xtx" class="build-button">Собрать</a>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="container">
+
+<h2 class="section-title">Как это работает</h2>
+
+<div class="cards">
+
+<div class="card">
+<h3>1. Выберите процессор</h3>
+<p>Начните с выбора процессора — это основа вашей сборки. Система покажет только совместимые с ним материнские платы.</p>
+</div>
+
+<div class="card">
+<h3>2. Добавьте материнскую плату</h3>
+<p>Автоматическая проверка сокета, чипсета и версии BIOS. Увидите предупреждения, если нужно обновление BIOS.</p>
+</div>
+
+<div class="card">
+<h3>3. Подберите оперативную память</h3>
+<p>Выбирайте тип (DDR4/DDR5), частоту и количество планок. Система учтёт ограничения процессора и материнской платы.</p>
+</div>
+
+<div class="card">
+<h3>4. Выберите видеокарту</h3>
+<p>Проверка совместимости с блоком питания по мощности и разъёмам, а также поместится ли она в корпус.</p>
+</div>
+
+<div class="card">
+<h3>5. Добавьте накопители</h3>
+<p>SSD и HDD с проверкой наличия нужных слотов и портов на материнской плате.</p>
+</div>
+
+<div class="card">
+<h3>6. Финальные штрихи</h3>
+<p>Корпус, блок питания и охлаждение. Система рассчитает общее энергопотребление и проверит совместимость всех компонентов.</p>
+</div>
+
+</div>
+
+</div>
+
+
+<footer>
+    <div>© 2026 PC Configurator — собери свой идеальный ПК</div>
+    <div class="footer-links">
+        <a href="#">О проекте</a>
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Помощь</a>
+        <a href="#">Контакты</a>
+    </div>
+</footer>
+
+</body>
+</html>

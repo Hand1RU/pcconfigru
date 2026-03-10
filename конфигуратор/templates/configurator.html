@@ -1,0 +1,3042 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Конфигуратор ПК - PC Configurator</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background:#0b0b0b;
+    color:#eee;
+    overflow-y: scroll;
+}
+
+/* СКРОЛЛБАР */
+::-webkit-scrollbar{ width:12px; }
+::-webkit-scrollbar-track{ background:#0b0b0b; border-radius:6px; }
+::-webkit-scrollbar-thumb{ background:#00eaff; border-radius:12px; box-shadow:0 0 8px #00eaff66; }
+::-webkit-scrollbar-thumb:hover{ background:#00ffff; }
+* { scrollbar-width: thin; scrollbar-color: #00eaff #0b0b0b; }
+
+/* HEADER */
+header{
+    background:#111;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #1f1f1f;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(17, 17, 17, 0.95);
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    background: linear-gradient(45deg, #00eaff, #00ff9c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+nav a{
+    margin-left:25px;
+    color:#bbb;
+    text-decoration:none;
+    transition: all 0.3s;
+    position: relative;
+}
+
+nav a:hover{
+    color:#00eaff;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #00eaff;
+    transition: width 0.3s;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* MAIN CONTAINER */
+.container{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
+    max-width:1300px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+/* БЛОКИ КОМПЛЕКТУЮЩИХ */
+.part{
+    background:#111;
+    border-radius:24px;
+    margin-bottom:20px;
+    border: 1px solid #1f1f1f;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.part:hover {
+    border-color: #00eaff;
+    box-shadow: 0 5px 20px rgba(0, 234, 255, 0.1);
+}
+
+.part-header{
+    padding:18px;
+    cursor:pointer;
+    background:#151515;
+    text-align:center;
+    font-weight:bold;
+    transition: all 0.3s;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.part-header:hover{ 
+    background:#1a1a1a;
+    color:#00eaff;
+}
+
+.part-header.active{ 
+    background:#00eaff; 
+    color:black;
+}
+
+.part-header.active:hover {
+    background:#00ffff;
+}
+
+.part-options{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.5s ease;
+    background:#0f0f0f;
+}
+
+.option-row{
+    display:flex;
+    gap:15px;
+    padding:15px;
+}
+
+.option-col{
+    flex:1;
+}
+
+.section-title{
+    color:#00eaff;
+    font-weight:bold;
+    margin:15px 0 10px;
+    padding-left:10px;
+    font-size:16px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.option{
+    padding:12px;
+    cursor:pointer;
+    background:#1a1a1a;
+    border-radius:12px;
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border: 1px solid #2a2a2a;
+    transition: all 0.2s;
+}
+
+.option:hover{ 
+    background:#222;
+    border-color:#00eaff;
+    transform: translateX(5px);
+}
+
+.option.selected{ 
+    background:#00eaff; 
+    color:black;
+    border-color:#00eaff;
+    font-weight:500;
+}
+
+.option.selected span {
+    color: #000;
+}
+
+.option.incompatible{
+    opacity:0.4;
+    cursor:not-allowed;
+    background:#1a1a1a;
+    filter: grayscale(0.5);
+    border-color:#3a3a3a;
+}
+
+.option.incompatible:hover{ 
+    background:#1a1a1a;
+    border-color:#3a3a3a;
+    transform: none;
+}
+
+/* Стиль для выбранного раздела */
+.part-header.selected-part {
+    background: #1a3a1a;
+    color: #a0ffa0;
+    border-left: 4px solid #00ff9c;
+}
+
+/* Стили для RAM с количеством */
+.ram-multiplier {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 10px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid #2a2a2a;
+}
+
+.ram-base-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 12px 12px 0 0;
+    transition: all 0.2s;
+}
+
+.ram-base-option:hover {
+    background: #222;
+}
+
+.ram-base-option.selected {
+    background: #00eaff;
+    color: black;
+    border-bottom: 1px solid #008080;
+}
+
+.ram-quantity {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #111;
+    border-radius: 0 0 12px 12px;
+    border-top: 1px solid #2a2a2a;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: #2a2a2a;
+    color: #00eaff;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-btn:hover:not(:disabled) {
+    background: #00eaff;
+    color: black;
+    transform: scale(1.05);
+}
+
+.quantity-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.quantity-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00ff9c;
+    min-width: 30px;
+    text-align: center;
+}
+
+.ram-total-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #00ff9c;
+    background: #1a1a1a;
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+/* ПРЕДУПРЕЖДЕНИЯ */
+.gpu-warning {
+    font-size: 12px;
+    color: #ffaa00;
+    margin-top: 4px;
+    display: none;
+}
+
+.option:hover .gpu-warning {
+    display: block;
+}
+
+.power-required {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.length-warning {
+    color: #ffaa00;
+}
+
+/* ПРАВАЯ ПАНЕЛЬ */
+.summary{
+    background:#111;
+    border-radius:24px;
+    padding:25px;
+    position:sticky;
+    top:100px;
+    border: 1px solid #1f1f1f;
+    height: fit-content;
+}
+
+.summary h2{ 
+    margin-top:0; 
+    color: #00eaff;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+#selected {
+    line-height: 1.8;
+    color: #aaa;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+#selected br {
+    margin-bottom: 5px;
+}
+
+.total{ 
+    font-size:32px; 
+    color:#00ff9c; 
+    margin-top:30px;
+    font-weight: bold;
+    border-top: 1px solid #2a2a2a;
+    padding-top: 20px;
+}
+
+/* FOOTER */
+footer{
+    margin-top:80px;
+    padding:40px;
+    text-align:center;
+    color:#666;
+    border-top:1px solid #1f1f1f;
+    background: #111;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.footer-links a {
+    color: #888;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #00eaff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+    
+    .option-row {
+        flex-direction: column;
+    }
+    
+    .summary {
+        position: static;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">⚡ PC CONFIG</div>
+    <nav>
+        <a href="/">Главная</a>
+        <a href="/configurator" class="active">Конфигуратор</a>
+        <a href="/sborki">Сборки</a>
+        <a href="/contacts">Контакты</a>
+    </nav>
+</header>
+
+<div class="container">
+
+<!-- LEFT SIDE -->
+<div>
+
+<!-- CPU -->
+<div class="part">
+    <div class="part-header">Процессор</div>
+    <div class="part-options">
+        <div class="option-row">
+            <!-- Intel Column -->
+            <div class="option-col">
+                <div class="section-title">Intel 12th Gen</div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="12000">Intel Core i3‑12100 <span>≈12 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="18000">Intel Core i5‑12400 <span>≈18 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="26000">Intel Core i7‑12700 <span>≈26 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="39000">Intel Core i9‑12900 <span>≈39 000 ₽</span></div>
+                
+                <div class="section-title">Intel 13th Gen</div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3600" data-max-ram="128" data-price="24000">Intel Core i5‑13600K <span>≈24 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3600" data-max-ram="128" data-price="31000">Intel Core i7‑13700KF <span>≈31 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3600" data-max-ram="128" data-price="45000">Intel Core i9‑13900K <span>≈45 000 ₽</span></div>
+                
+                <div class="section-title">Intel 14th Gen</div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="5600" data-max-ram="192" data-price="28000">Intel Core i5‑14600K <span>≈28 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="5600" data-max-ram="192" data-price="36000">Intel Core i7‑14700K <span>≈36 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="5600" data-max-ram="192" data-price="48000">Intel Core i9‑14900K <span>≈48 000 ₽</span></div>
+                
+                <div class="section-title">Intel Core Ultra</div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5600" data-max-ram-speed="6400" data-max-ram="256" data-price="52000">Intel Core Ultra 5‑225 <span>≈52 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5600" data-max-ram-speed="6400" data-max-ram="256" data-price="58000">Intel Core Ultra 5‑245K <span>≈58 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5600" data-max-ram-speed="6400" data-max-ram="256" data-price="67000">Intel Core Ultra 7‑265K <span>≈67 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5600" data-max-ram-speed="6400" data-max-ram="256" data-price="70000">Intel Core Ultra 7‑265KF <span>≈70 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5600" data-max-ram-speed="6400" data-max-ram="256" data-price="85000">Intel Core Ultra 9‑285K <span>≈85 000 ₽</span></div>
+            </div>
+
+            <!-- AMD Column -->
+            <div class="option-col">
+                <div class="section-title">AMD Ryzen 5000</div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="10000">AMD Ryzen 5‑5600 <span>≈10 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="14000">AMD Ryzen 7‑5700X <span>≈14 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="22000">AMD Ryzen 9‑5900X <span>≈22 000 ₽</span></div>
+                
+                <div class="section-title">AMD Ryzen 7000</div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6000" data-max-ram="128" data-price="15000">AMD Ryzen 5‑7600 <span>≈15 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6000" data-max-ram="128" data-price="24000">AMD Ryzen 7‑7700 <span>≈24 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6000" data-max-ram="128" data-price="58000">AMD Ryzen 9‑7950X <span>≈58 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6000" data-max-ram="128" data-price="31000">AMD Ryzen 7‑7800X3D <span>≈31 000 ₽</span></div>
+                
+                <div class="section-title">AMD Ryzen 9000</div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5200" data-max-ram-speed="6000" data-max-ram="192" data-price="26000">AMD Ryzen 5‑9600X <span>≈26 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5200" data-max-ram-speed="6000" data-max-ram="192" data-price="36000">AMD Ryzen 7‑9700X <span>≈36 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5200" data-max-ram-speed="6000" data-max-ram="192" data-price="48000">AMD Ryzen 9‑9900X <span>≈48 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5200" data-max-ram-speed="6000" data-max-ram="192" data-price="52000">AMD Ryzen 9‑9950X <span>≈52 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5200" data-max-ram-speed="6000" data-max-ram="192" data-price="34000">AMD Ryzen 7‑9800X3D <span>≈34 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5200" data-max-ram-speed="6000" data-max-ram="192" data-price="49000">AMD Ryzen 9‑9900X3D <span>≈49 000 ₽</span></div>
+                <div class="option" data-type="cpu" data-ram-type="ddr5" data-min-ram-speed="5200" data-max-ram-speed="6000" data-max-ram="192" data-price="54000">AMD Ryzen 9‑9950X3D <span>≈54 000 ₽</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphics Card -->
+<div class="part">
+    <div class="part-header">Видеокарта</div>
+    <div class="part-options">
+        <div class="option-row">
+            <div class="option-col">
+                <div class="section-title">GeForce</div>
+                <div class="option" data-type="gpu" data-price="25000">RTX 3050, 8 ГБ GDDR6 <span>≈25 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="35000">RTX 3060, 12 ГБ GDDR6 <span>≈35 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="42500">RTX 3060 Ti, 8 ГБ GDDR6 <span>≈42 500 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="67400">RTX 3070, 8 ГБ GDDR6X <span>≈67 400 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="81700">RTX 3070 Ti, 16 ГБ GDDR6X <span>≈81 700 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="98000">RTX 3080, 10 ГБ GDDR6X <span>≈98 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="120000">RTX 3080 Ti, 12 ГБ GDDR6X <span>≈120 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="180000">RTX 3090, 24 ГБ GDDR6X <span>≈180 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="45000">RTX 4060, 12 ГБ GDDR6X <span>≈45 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="70000">RTX 4070, 12 ГБ GDDR6X <span>≈70 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="110000">RTX 4080, 16 ГБ GDDR6X <span>≈110 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="250000">RTX 4090, 24 ГБ GDDR6X <span>≈250 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="35000">RTX 5060, 8 ГБ GDDR7 <span>≈35 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="42500">RTX 5060 Ti, 16 ГБ GDDR7 <span>≈42 500 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="67400">RTX 5070, 12 ГБ GDDR7 <span>≈67 400 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="81700">RTX 5070 Ti, 16 ГБ GDDR7 <span>≈81 700 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="98000">RTX 5080, 16 ГБ GDDR7 <span>≈98 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="380000">RTX 5090, 32 ГБ GDDR7 <span>≈380 000 ₽</span></div>
+            </div>
+            <div class="option-col">
+                <div class="section-title">Radeon</div>
+                <div class="option" data-type="gpu" data-price="28000">RX 6600, 8 ГБ GDDR6 <span>≈28 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="35000">RX 6600 XT, 8 ГБ GDDR6 <span>≈35 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="55000">RX 6700 XT, 12 ГБ GDDR6 <span>≈55 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="65000">RX 6800, 16 ГБ GDDR6 <span>≈65 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="80000">RX 6800 XT, 16 ГБ GDDR6 <span>≈80 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="110000">RX 6900 XT, 16 ГБ GDDR6 <span>≈110 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="30000">RX 7600, 8 ГБ GDDR6 <span>≈30 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="60000">RX 7700 XT, 12 ГБ GDDR6 <span>≈60 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="90000">RX 7800 XT, 16 ГБ GDDR6 <span>≈90 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="150000">RX 7900 XTX, 24 ГБ GDDR6 <span>≈150 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="48000">RX 9060 XT, 16 ГБ GDDR6 <span>≈48 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="86000">RX 9070, 16 ГБ GDDR6 <span>≈86 000 ₽</span></div>
+                <div class="option" data-type="gpu" data-price="101000">RX 9070 XT, 16 ГБ GDDR6 <span>≈101 000 ₽</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RAM -->
+<div class="part">
+    <div class="part-header">Оперативная память</div>
+    <div class="part-options">
+        <div class="option-row">
+            <div class="option-col">
+                <div class="section-title">DDR4</div>
+                
+                <!-- DDR4 2133MHz -->
+                <div class="ram-multiplier" data-base-price="3500" data-ram-type="ddr4" data-ram-speed="2133" data-ram-size="8" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="3500">DDR4 8GB 2133MHz <span>≈3 500 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">3 500 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="6500" data-ram-type="ddr4" data-ram-speed="2133" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="6500">DDR4 16GB 2133MHz <span>≈6 500 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">6 500 ₽</span>
+                    </div>
+                </div>
+                
+                <!-- DDR4 2666MHz -->
+                <div class="ram-multiplier" data-base-price="3800" data-ram-type="ddr4" data-ram-speed="2666" data-ram-size="8" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="3800">DDR4 8GB 2666MHz <span>≈3 800 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">3 800 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="7000" data-ram-type="ddr4" data-ram-speed="2666" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="7000">DDR4 16GB 2666MHz <span>≈7 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">7 000 ₽</span>
+                    </div>
+                </div>
+                
+                <!-- DDR4 3200MHz -->
+                <div class="ram-multiplier" data-base-price="4000" data-ram-type="ddr4" data-ram-speed="3200" data-ram-size="8" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="4000">DDR4 8GB 3200MHz <span>≈4 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">4 000 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="8000" data-ram-type="ddr4" data-ram-speed="3200" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="8000">DDR4 16GB 3200MHz <span>≈8 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">8 000 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="16000" data-ram-type="ddr4" data-ram-speed="3200" data-ram-size="32" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="16000">DDR4 32GB 3200MHz <span>≈16 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">16 000 ₽</span>
+                    </div>
+                </div>
+                
+                <!-- DDR4 3600MHz -->
+                <div class="ram-multiplier" data-base-price="9500" data-ram-type="ddr4" data-ram-speed="3600" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="9500">DDR4 16GB 3600MHz <span>≈9 500 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">9 500 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="18500" data-ram-type="ddr4" data-ram-speed="3600" data-ram-size="32" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="18500">DDR4 32GB 3600MHz <span>≈18 500 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">18 500 ₽</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="option-col">
+                <div class="section-title">DDR5</div>
+                
+                <!-- DDR5 4800MHz -->
+                <div class="ram-multiplier" data-base-price="22000" data-ram-type="ddr5" data-ram-speed="4800" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="22000">DDR5 16GB 4800MHz <span>≈22 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">22 000 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="42000" data-ram-type="ddr5" data-ram-speed="4800" data-ram-size="32" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="42000">DDR5 32GB 4800MHz <span>≈42 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">42 000 ₽</span>
+                    </div>
+                </div>
+                
+                <!-- DDR5 5200MHz -->
+                <div class="ram-multiplier" data-base-price="25000" data-ram-type="ddr5" data-ram-speed="5200" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="25000">DDR5 16GB 5200MHz <span>≈25 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">25 000 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="48000" data-ram-type="ddr5" data-ram-speed="5200" data-ram-size="32" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="48000">DDR5 32GB 5200MHz <span>≈48 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">48 000 ₽</span>
+                    </div>
+                </div>
+                
+                <!-- DDR5 5600MHz -->
+                <div class="ram-multiplier" data-base-price="27000" data-ram-type="ddr5" data-ram-speed="5600" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="27000">DDR5 16GB 5600MHz <span>≈27 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">27 000 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="52000" data-ram-type="ddr5" data-ram-speed="5600" data-ram-size="32" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="52000">DDR5 32GB 5600MHz <span>≈52 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">52 000 ₽</span>
+                    </div>
+                </div>
+                
+                <!-- DDR5 6000MHz -->
+                <div class="ram-multiplier" data-base-price="28000" data-ram-type="ddr5" data-ram-speed="6000" data-ram-size="16" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="28000">DDR5 16GB 6000MHz <span>≈28 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">28 000 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="50000" data-ram-type="ddr5" data-ram-speed="6000" data-ram-size="32" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="50000">DDR5 32GB 6000MHz <span>≈50 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">50 000 ₽</span>
+                    </div>
+                </div>
+                
+                <div class="ram-multiplier" data-base-price="64000" data-ram-type="ddr5" data-ram-speed="6000" data-ram-size="64" data-max-multiplier="4">
+                    <div class="ram-base-option" data-type="ram-base" data-price="64000">DDR5 64GB 6000MHz <span>≈64 000 ₽</span></div>
+                    <div class="ram-quantity" style="display: none;">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" disabled>-</button>
+                            <span class="quantity-value">1</span>
+                            <button class="quantity-btn plus" disabled>+</button>
+                        </div>
+                        <span class="ram-total-price">64 000 ₽</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SSD -->
+<div class="part">
+    <div class="part-header">SSD</div>
+    <div class="part-options">
+        <div class="option" data-type="ssd" data-price="8000">500GB NVMe <span>≈8 000 ₽</span></div>
+        <div class="option" data-type="ssd" data-price="13000">1TB NVMe <span>≈13 000 ₽</span></div>
+        <div class="option" data-type="ssd" data-price="21000">2TB NVMe <span>≈21 000 ₽</span></div>
+        <div class="option" data-type="ssd" data-price="11500">1TB SATA <span>≈11 500 ₽</span></div>
+        <div class="option" data-type="ssd" data-price="20000">2TB SATA <span>≈20 000 ₽</span></div>
+    </div>
+</div>
+
+<!-- Motherboard -->
+<div class="part">
+    <div class="part-header">Материнская плата</div>
+    <div class="part-options">
+        <div class="option-row">
+            <div class="option-col">
+                <div class="section-title">Intel LGA1700 (DDR4)</div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="5600">ASRock H610M-HVS <span>≈5 600 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="5000">MSI H610M-A DDR4 <span>≈5 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3600" data-max-ram="128" data-price="20000">Gigabyte B660M AORUS PRO AX DDR4 <span>≈20 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3600" data-max-ram="128" data-price="17000">ASUS TUF Gaming B660M-PLUS D4 <span>≈17 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3600" data-max-ram="128" data-price="13500">ASRock B660 Phantom Gaming 4.0 DDR4 <span>≈13 500 ₽</span></div>
+                
+                <div class="section-title">Intel LGA1700 (DDR5)</div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="5600" data-max-ram="128" data-price="50000">ASUS ROG STRIX Z790-E GAMING WIFI DDR5 <span>≈50 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="5600" data-max-ram="128" data-price="59000">MSI MEG Z790 ACE DDR5 <span>≈59 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="lga1700" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6000" data-max-ram="192" data-price="65000">ASUS ROG MAXIMUS Z790 EXTREME DDR5 <span>≈65 000 ₽</span></div>
+            </div>
+            <div class="option-col">
+                <div class="section-title">AMD AM4 (DDR4)</div>
+                <div class="option" data-type="motherboard" data-socket="am4" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="128" data-price="5400">MSI B550M PRO-VDH MAX <span>≈5 400 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am4" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3600" data-max-ram="128" data-price="6500">ASUS TUF Gaming B550M-PLUS <span>≈6 500 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am4" data-ram-type="ddr4" data-min-ram-speed="2133" data-max-ram-speed="3200" data-max-ram="64" data-price="5200">ASRock A520M-HDV R4.0 <span>≈5 200 ₽</span></div>
+                
+                <div class="section-title">AMD AM5 (DDR5)</div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="5600" data-max-ram="128" data-price="42000">ASRock A620M Pro RS <span>≈42 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6000" data-max-ram="128" data-price="12500">MSI B650 Tomahawk WiFi <span>≈12 500 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6000" data-max-ram="128" data-price="13000">ASUS TUF Gaming B650-PLUS <span>≈13 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6400" data-max-ram="192" data-price="14500">Gigabyte B850 AORUS Master <span>≈14 500 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6400" data-max-ram="192" data-price="18000">MSI X670E Carbon WiFi <span>≈18 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6400" data-max-ram="192" data-price="19000">MSI X870 Carbon WiFi <span>≈19 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6400" data-max-ram="192" data-price="19500">ASUS ROG Crosshair X870 Hero <span>≈19 500 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6400" data-max-ram="192" data-price="21000">ASUS ROG Crosshair X870E Extreme <span>≈21 000 ₽</span></div>
+                <div class="option" data-type="motherboard" data-socket="am5" data-ram-type="ddr5" data-min-ram-speed="4800" data-max-ram-speed="6400" data-max-ram="256" data-price="25000">MSI X870E Godlike <span>≈25 000 ₽</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PSU -->
+<div class="part">
+    <div class="part-header">Блок питания</div>
+    <div class="part-options">
+        <div class="option" data-type="psu" data-price="5000">600W Bronze <span>≈5 000 ₽</span></div>
+        <div class="option" data-type="psu" data-price="8000">750W Gold <span>≈8 000 ₽</span></div>
+        <div class="option" data-type="psu" data-price="10000">850W Gold <span>≈10 000 ₽</span></div>
+    </div>
+</div>
+
+<!-- Case -->
+<div class="part">
+    <div class="part-header">Корпус</div>
+    <div class="part-options">
+        <div class="option" data-type="case" data-price="7000">NZXT H510 <span>≈7 000 ₽</span></div>
+        <div class="option" data-type="case" data-price="9000">Corsair 4000D <span>≈9 000 ₽</span></div>
+        <div class="option" data-type="case" data-price="12000">Lian Li O11 <span>≈12 000 ₽</span></div>
+    </div>
+</div>
+
+<!-- Cooling -->
+<div class="part">
+    <div class="part-header">Охлаждение</div>
+    <div class="part-options">
+        <div class="option" data-type="cooling" data-price="2500">Воздушное Cooler Master <span>≈2 500 ₽</span></div>
+        <div class="option" data-type="cooling" data-price="4000">Воздушное Noctua <span>≈4 000 ₽</span></div>
+        <div class="option" data-type="cooling" data-price="8000">Жидкостное 240mm <span>≈8 000 ₽</span></div>
+        <div class="option" data-type="cooling" data-price="12000">Жидкостное 360mm <span>≈12 000 ₽</span></div>
+    </div>
+</div>
+
+</div>
+
+<!-- RIGHT SIDE -->
+<div class="summary">
+    <h2>Ваша сборка</h2>
+    <div id="selected">Выберите комплектующие</div>
+    <div class="total">0 ₽</div>
+</div>
+
+</div>
+
+<footer>
+    <div>© 2026 PC Configurator — собери свой идеальный ПК</div>
+    <div class="footer-links">
+        <a href="/">Главная</a>
+        <a href="/configurator">Конфигуратор</a>
+        <a href="/sborki">Сборки</a>
+        <a href="/contacts">Контакты</a>
+    </div>
+</footer>
+
+<script>
+let build = {
+    "процессор": null,
+    "материнская плата": null,
+    "оперативная память": null,
+    "видеокарта": null,
+    "ssd": null,
+    "блок питания": null,
+    "корпус": null,
+    "охлаждение": null
+};
+
+// Разворачивание блоков
+let openList = null;
+document.querySelectorAll(".part-header").forEach(header => {
+    header.onclick = () => {
+        const list = header.nextElementSibling;
+        if(openList && openList !== list){
+            openList.style.maxHeight = null;
+            openList.previousElementSibling.classList.remove("active");
+        }
+        if(list.style.maxHeight){
+            list.style.maxHeight = null;
+            header.classList.remove("active");
+            openList = null;
+        } else {
+            list.style.maxHeight = list.scrollHeight + "px";
+            header.classList.add("active");
+            openList = list;
+        }
+    }
+});
+
+// Расширенная база данных совместимости процессоров и плат
+const compatibilityDB = {
+    // Intel 12th gen
+    "Intel Core i3‑12100": {
+        socket: "lga1700",
+        generation: "12",
+        tdp: 60,
+        requiresK: false,
+        minChipset: ["h610", "b660", "h670", "z690"],
+        biosVersion: {
+            "h610": "any",
+            "b660": "any",
+            "h670": "any",
+            "z690": "any"
+        },
+        warnings: {
+            "h610": "Ограниченные возможности расширения, нет разгона"
+        }
+    },
+    "Intel Core i5‑12400": {
+        socket: "lga1700",
+        generation: "12",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["h610", "b660", "h670", "z690"],
+        biosVersion: {
+            "h610": "any",
+            "b660": "any",
+            "h670": "any",
+            "z690": "any"
+        },
+        warnings: {
+            "h610": "Ограниченные возможности расширения, нет разгона"
+        }
+    },
+    "Intel Core i7‑12700": {
+        socket: "lga1700",
+        generation: "12",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["b660", "h670", "z690"],
+        biosVersion: {
+            "b660": "any",
+            "h670": "any",
+            "z690": "any"
+        },
+        warnings: {
+            "b660": "Рекомендуется хорошее охлаждение VRM"
+        }
+    },
+    "Intel Core i9‑12900": {
+        socket: "lga1700",
+        generation: "12",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["z690"],
+        biosVersion: {
+            "z690": "any"
+        },
+        warnings: {
+            "z690": "Требуется качественное охлаждение VRM"
+        }
+    },
+    
+    // Intel 13th gen
+    "Intel Core i5‑13600K": {
+        socket: "lga1700",
+        generation: "13",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["b660", "z690", "b760", "z790"],
+        biosVersion: {
+            "b660": "min_f7",
+            "z690": "min_f7",
+            "b760": "any",
+            "z790": "any"
+        },
+        warnings: {
+            "b660": "Требуется обновление BIOS для поддержки 13-го поколения",
+            "z690": "Требуется обновление BIOS для поддержки 13-го поколения",
+            "b760": "Рекомендуется хорошее охлаждение"
+        }
+    },
+    "Intel Core i7‑13700KF": {
+        socket: "lga1700",
+        generation: "13",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z690", "b760", "z790"],
+        biosVersion: {
+            "z690": "min_f7",
+            "b760": "any",
+            "z790": "any"
+        },
+        warnings: {
+            "z690": "Требуется обновление BIOS для поддержки 13-го поколения",
+            "b760": "Рекомендуется хорошее охлаждение VRM"
+        }
+    },
+    "Intel Core i9‑13900K": {
+        socket: "lga1700",
+        generation: "13",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z690", "z790"],
+        biosVersion: {
+            "z690": "min_f7",
+            "z790": "any"
+        },
+        warnings: {
+            "z690": "Требуется обновление BIOS, обязательно хорошее охлаждение VRM",
+            "z790": "Требуется качественное охлаждение VRM"
+        }
+    },
+    
+    // Intel 14th gen
+    "Intel Core i5‑14600K": {
+        socket: "lga1700",
+        generation: "14",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z690", "b760", "z790"],
+        biosVersion: {
+            "z690": "min_f11",
+            "b760": "min_f8",
+            "z790": "min_f2"
+        },
+        warnings: {
+            "z690": "Требуется обновление BIOS, может потребоваться 2-3 версии",
+            "b760": "Требуется обновление BIOS",
+            "z790": "Требуется обновление BIOS"
+        }
+    },
+    "Intel Core i7‑14700K": {
+        socket: "lga1700",
+        generation: "14",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z690", "z790"],
+        biosVersion: {
+            "z690": "min_f11",
+            "z790": "min_f2"
+        },
+        warnings: {
+            "z690": "Требуется обновление BIOS, обязательно хорошее охлаждение VRM",
+            "z790": "Требуется обновление BIOS"
+        }
+    },
+    "Intel Core i9‑14900K": {
+        socket: "lga1700",
+        generation: "14",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z690", "z790"],
+        biosVersion: {
+            "z690": "min_f11",
+            "z790": "min_f2"
+        },
+        warnings: {
+            "z690": "Требуется обновление BIOS, требуется качественное охлаждение VRM",
+            "z790": "Требуется обновление BIOS, требуется качественное охлаждение VRM"
+        }
+    },
+    
+    // Intel Core Ultra
+    "Intel Core Ultra 5‑225": {
+        socket: "lga1851",
+        generation: "ultra1",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["z890", "b860", "h810"],
+        biosVersion: {
+            "z890": "any",
+            "b860": "any",
+            "h810": "any"
+        },
+        warnings: {
+            "z890": "Новая платформа, убедитесь в совместимости"
+        }
+    },
+    "Intel Core Ultra 5‑245K": {
+        socket: "lga1851",
+        generation: "ultra1",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z890"],
+        biosVersion: {
+            "z890": "any"
+        },
+        warnings: {
+            "z890": "Требуется качественное охлаждение"
+        }
+    },
+    "Intel Core Ultra 7‑265K": {
+        socket: "lga1851",
+        generation: "ultra1",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z890"],
+        biosVersion: {
+            "z890": "any"
+        },
+        warnings: {
+            "z890": "Требуется качественное охлаждение"
+        }
+    },
+    "Intel Core Ultra 9‑285K": {
+        socket: "lga1851",
+        generation: "ultra1",
+        tdp: 125,
+        requiresK: true,
+        minChipset: ["z890"],
+        biosVersion: {
+            "z890": "any"
+        },
+        warnings: {
+            "z890": "Требуется качественное охлаждение VRM"
+        }
+    },
+    
+    // AMD Ryzen 5000
+    "AMD Ryzen 5‑5600": {
+        socket: "am4",
+        generation: "5000",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["a520", "b450", "b550", "x470", "x570"],
+        biosVersion: {
+            "a520": "any",
+            "b450": "min_f3",
+            "b550": "any",
+            "x470": "min_f3",
+            "x570": "any"
+        },
+        warnings: {
+            "b450": "Требуется обновление BIOS",
+            "x470": "Требуется обновление BIOS"
+        }
+    },
+    "AMD Ryzen 7‑5700X": {
+        socket: "am4",
+        generation: "5000",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["b450", "b550", "x470", "x570"],
+        biosVersion: {
+            "b450": "min_f3",
+            "b550": "any",
+            "x470": "min_f3",
+            "x570": "any"
+        },
+        warnings: {
+            "b450": "Требуется обновление BIOS",
+            "x470": "Требуется обновление BIOS"
+        }
+    },
+    "AMD Ryzen 9‑5900X": {
+        socket: "am4",
+        generation: "5000",
+        tdp: 105,
+        requiresK: false,
+        minChipset: ["b550", "x570"],
+        biosVersion: {
+            "b550": "any",
+            "x570": "any"
+        },
+        warnings: {
+            "b550": "Рекомендуется хорошее охлаждение VRM",
+            "x570": "Рекомендуется хорошее охлаждение VRM"
+        }
+    },
+    
+    // AMD Ryzen 7000
+    "AMD Ryzen 5‑7600": {
+        socket: "am5",
+        generation: "7000",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["a620", "b650", "b650e", "x670", "x670e"],
+        biosVersion: {
+            "a620": "any",
+            "b650": "any",
+            "b650e": "any",
+            "x670": "any",
+            "x670e": "any"
+        },
+        warnings: {
+            "a620": "Ограниченные возможности расширения"
+        }
+    },
+    "AMD Ryzen 7‑7700": {
+        socket: "am5",
+        generation: "7000",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["b650", "b650e", "x670", "x670e"],
+        biosVersion: {
+            "b650": "any",
+            "b650e": "any",
+            "x670": "any",
+            "x670e": "any"
+        },
+        warnings: {}
+    },
+    "AMD Ryzen 7‑7800X3D": {
+        socket: "am5",
+        generation: "7000",
+        tdp: 120,
+        requiresK: true,
+        minChipset: ["b650", "b650e", "x670", "x670e"],
+        biosVersion: {
+            "b650": "any",
+            "b650e": "any",
+            "x670": "any",
+            "x670e": "any"
+        },
+        warnings: {
+            "b650": "Рекомендуется хорошее охлаждение",
+            "b650e": "Рекомендуется хорошее охлаждение"
+        }
+    },
+    "AMD Ryzen 9‑7950X": {
+        socket: "am5",
+        generation: "7000",
+        tdp: 170,
+        requiresK: false,
+        minChipset: ["x670", "x670e"],
+        biosVersion: {
+            "x670": "any",
+            "x670e": "any"
+        },
+        warnings: {
+            "x670": "Требуется качественное охлаждение VRM",
+            "x670e": "Требуется качественное охлаждение VRM"
+        }
+    },
+    
+    // AMD Ryzen 9000
+    "AMD Ryzen 5‑9600X": {
+        socket: "am5",
+        generation: "9000",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["b650", "b650e", "x670", "x670e", "b850", "x870", "x870e"],
+        biosVersion: {
+            "b650": "min_f2",
+            "b650e": "min_f2",
+            "x670": "min_f2",
+            "x670e": "min_f2",
+            "b850": "any",
+            "x870": "any",
+            "x870e": "any"
+        },
+        warnings: {
+            "b650": "Требуется обновление BIOS для поддержки 9000 серии",
+            "b650e": "Требуется обновление BIOS для поддержки 9000 серии",
+            "x670": "Требуется обновление BIOS для поддержки 9000 серии",
+            "x670e": "Требуется обновление BIOS для поддержки 9000 серии"
+        }
+    },
+    "AMD Ryzen 7‑9700X": {
+        socket: "am5",
+        generation: "9000",
+        tdp: 65,
+        requiresK: false,
+        minChipset: ["b650", "b650e", "x670", "x670e", "b850", "x870", "x870e"],
+        biosVersion: {
+            "b650": "min_f2",
+            "b650e": "min_f2",
+            "x670": "min_f2",
+            "x670e": "min_f2",
+            "b850": "any",
+            "x870": "any",
+            "x870e": "any"
+        },
+        warnings: {
+            "b650": "Требуется обновление BIOS для поддержки 9000 серии",
+            "b650e": "Требуется обновление BIOS для поддержки 9000 серии",
+            "x670": "Требуется обновление BIOS для поддержки 9000 серии",
+            "x670e": "Требуется обновление BIOS для поддержки 9000 серии"
+        }
+    },
+    "AMD Ryzen 7‑9800X3D": {
+        socket: "am5",
+        generation: "9000",
+        tdp: 120,
+        requiresK: true,
+        minChipset: ["x670", "x670e", "b850", "x870", "x870e"],
+        biosVersion: {
+            "x670": "min_f2",
+            "x670e": "min_f2",
+            "b850": "any",
+            "x870": "any",
+            "x870e": "any"
+        },
+        warnings: {
+            "x670": "Требуется обновление BIOS для поддержки 9000 серии",
+            "x670e": "Требуется обновление BIOS для поддержки 9000 серии",
+            "b850": "Рекомендуется хорошее охлаждение",
+            "x870": "Рекомендуется хорошее охлаждение"
+        }
+    },
+    "AMD Ryzen 9‑9950X": {
+        socket: "am5",
+        generation: "9000",
+        tdp: 170,
+        requiresK: false,
+        minChipset: ["x670e", "x870", "x870e"],
+        biosVersion: {
+            "x670e": "min_f2",
+            "x870": "any",
+            "x870e": "any"
+        },
+        warnings: {
+            "x670e": "Требуется обновление BIOS, качественное охлаждение VRM",
+            "x870": "Требуется качественное охлаждение VRM",
+            "x870e": "Требуется качественное охлаждение VRM"
+        }
+    }
+};
+
+// База данных совместимости процессоров с RAM
+const cpuRAMDB = {
+    // Intel 12th gen
+    "Intel Core i3‑12100": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Официально поддерживается 3200MHz, более высокая частота может работать нестабильно"
+        }
+    },
+    "Intel Core i5‑12400": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Официально поддерживается 3200MHz, более высокая частота может работать нестабильно"
+        }
+    },
+    "Intel Core i7‑12700": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Официально поддерживается 3200MHz, более высокая частота может работать нестабильно"
+        }
+    },
+    "Intel Core i9‑12900": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Официально поддерживается 3200MHz, более высокая частота может работать нестабильно"
+        }
+    },
+    
+    // Intel 13th gen
+    "Intel Core i5‑13600K": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3600,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Поддерживает DDR4 до 3600MHz и DDR5 (через материнскую плату)"
+        }
+    },
+    "Intel Core i7‑13700KF": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3600,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Поддерживает DDR4 до 3600MHz и DDR5 (через материнскую плату)"
+        }
+    },
+    "Intel Core i9‑13900K": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3600,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Поддерживает DDR4 до 3600MHz и DDR5 (через материнскую плату)"
+        }
+    },
+    
+    // Intel 14th gen
+    "Intel Core i5‑14600K": {
+        ramType: "ddr5",
+        maxRam: 192,
+        minRamSpeed: 4800,
+        maxRamSpeed: 5600,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Официально до 5600MHz, разгоном до 6000+"
+        }
+    },
+    "Intel Core i7‑14700K": {
+        ramType: "ddr5",
+        maxRam: 192,
+        minRamSpeed: 4800,
+        maxRamSpeed: 5600,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Официально до 5600MHz, разгоном до 6000+"
+        }
+    },
+    "Intel Core i9‑14900K": {
+        ramType: "ddr5",
+        maxRam: 192,
+        minRamSpeed: 4800,
+        maxRamSpeed: 5600,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Официально до 5600MHz, разгоном до 6000+"
+        }
+    },
+    
+    // Intel Core Ultra
+    "Intel Core Ultra 5‑225": {
+        ramType: "ddr5",
+        maxRam: 256,
+        minRamSpeed: 5600,
+        maxRamSpeed: 6400,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Поддержка DDR5 до 6400MHz"
+        }
+    },
+    "Intel Core Ultra 5‑245K": {
+        ramType: "ddr5",
+        maxRam: 256,
+        minRamSpeed: 5600,
+        maxRamSpeed: 6400,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Поддержка DDR5 до 6400MHz"
+        }
+    },
+    "Intel Core Ultra 7‑265K": {
+        ramType: "ddr5",
+        maxRam: 256,
+        minRamSpeed: 5600,
+        maxRamSpeed: 6400,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Поддержка DDR5 до 6400MHz"
+        }
+    },
+    "Intel Core Ultra 9‑285K": {
+        ramType: "ddr5",
+        maxRam: 256,
+        minRamSpeed: 5600,
+        maxRamSpeed: 6400,
+        dualChannel: true,
+        warnings: {
+            "highSpeed": "Поддержка DDR5 до 6400MHz"
+        }
+    },
+    
+    // AMD Ryzen 5000
+    "AMD Ryzen 5‑5600": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 3200-3600MHz в разгоне"
+        }
+    },
+    "AMD Ryzen 7‑5700X": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 3200-3600MHz в разгоне"
+        }
+    },
+    "AMD Ryzen 9‑5900X": {
+        ramType: "ddr4",
+        maxRam: 128,
+        minRamSpeed: 2133,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 3200-3600MHz в разгоне"
+        }
+    },
+    
+    // AMD Ryzen 7000
+    "AMD Ryzen 5‑7600": {
+        ramType: "ddr5",
+        maxRam: 128,
+        minRamSpeed: 4800,
+        maxRamSpeed: 5200,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 5200-6000MHz"
+        }
+    },
+    "AMD Ryzen 7‑7700": {
+        ramType: "ddr5",
+        maxRam: 128,
+        minRamSpeed: 4800,
+        maxRamSpeed: 5200,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 5200-6000MHz"
+        }
+    },
+    "AMD Ryzen 7‑7800X3D": {
+        ramType: "ddr5",
+        maxRam: 128,
+        minRamSpeed: 4800,
+        maxRamSpeed: 6000,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 6000MHz для максимальной производительности"
+        }
+    },
+    "AMD Ryzen 9‑7950X": {
+        ramType: "ddr5",
+        maxRam: 128,
+        minRamSpeed: 4800,
+        maxRamSpeed: 5200,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 5200-6000MHz"
+        }
+    },
+    
+    // AMD Ryzen 9000
+    "AMD Ryzen 5‑9600X": {
+        ramType: "ddr5",
+        maxRam: 192,
+        minRamSpeed: 5200,
+        maxRamSpeed: 6000,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 6000MHz"
+        }
+    },
+    "AMD Ryzen 7‑9700X": {
+        ramType: "ddr5",
+        maxRam: 192,
+        minRamSpeed: 5200,
+        maxRamSpeed: 6000,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 6000MHz"
+        }
+    },
+    "AMD Ryzen 7‑9800X3D": {
+        ramType: "ddr5",
+        maxRam: 192,
+        minRamSpeed: 5200,
+        maxRamSpeed: 6000,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 6000MHz для X3D процессоров"
+        }
+    },
+    "AMD Ryzen 9‑9950X": {
+        ramType: "ddr5",
+        maxRam: 192,
+        minRamSpeed: 5200,
+        maxRamSpeed: 6000,
+        dualChannel: true,
+        warnings: {
+            "sweetSpot": "Оптимальная частота 6000MHz"
+        }
+    }
+};
+
+// База данных совместимости материнских плат с RAM
+const motherboardRAMDB = {
+    // Intel LGA1700 DDR4
+    "ASRock H610M-HVS": {
+        ramType: "ddr4",
+        maxRam: 64,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        slots: 2,
+        warnings: "Всего 2 слота, максимальная частота 3200MHz"
+    },
+    "MSI H610M-A DDR4": {
+        ramType: "ddr4",
+        maxRam: 64,
+        maxRamSpeed: 3200,
+        dualChannel: true,
+        slots: 2,
+        warnings: "Всего 2 слота, максимальная частота 3200MHz"
+    },
+    "Gigabyte B660M AORUS PRO AX DDR4": {
+        ramType: "ddr4",
+        maxRam: 128,
+        maxRamSpeed: 5333,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка разгона памяти до 5333MHz"
+    },
+    "ASUS TUF Gaming B660M-PLUS D4": {
+        ramType: "ddr4",
+        maxRam: 128,
+        maxRamSpeed: 5333,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка разгона памяти до 5333MHz"
+    },
+    "ASRock B660 Phantom Gaming 4.0 DDR4": {
+        ramType: "ddr4",
+        maxRam: 128,
+        maxRamSpeed: 5000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка разгона памяти до 5000MHz"
+    },
+    
+    // Intel LGA1700 DDR5
+    "ASUS ROG STRIX Z790-E GAMING WIFI DDR5": {
+        ramType: "ddr5",
+        maxRam: 128,
+        maxRamSpeed: 7800,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка высоких частот до 7800MHz"
+    },
+    "MSI MEG Z790 ACE DDR5": {
+        ramType: "ddr5",
+        maxRam: 192,
+        maxRamSpeed: 8000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка высоких частот до 8000MHz"
+    },
+    "ASUS ROG MAXIMUS Z790 EXTREME DDR5": {
+        ramType: "ddr5",
+        maxRam: 192,
+        maxRamSpeed: 8000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка высоких частот до 8000MHz"
+    },
+    
+    // AMD AM4
+    "MSI B550M PRO-VDH MAX": {
+        ramType: "ddr4",
+        maxRam: 128,
+        maxRamSpeed: 4400,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка разгона памяти"
+    },
+    "ASUS TUF Gaming B550M-PLUS": {
+        ramType: "ddr4",
+        maxRam: 128,
+        maxRamSpeed: 4400,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка разгона памяти"
+    },
+    "ASRock A520M-HDV R4.0": {
+        ramType: "ddr4",
+        maxRam: 64,
+        maxRamSpeed: 4733,
+        dualChannel: true,
+        slots: 2,
+        warnings: "Всего 2 слота, без разгона памяти"
+    },
+    
+    // AMD AM5
+    "ASRock A620M Pro RS": {
+        ramType: "ddr5",
+        maxRam: 128,
+        maxRamSpeed: 5600,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Базовая поддержка DDR5, без разгона"
+    },
+    "MSI B650 Tomahawk WiFi": {
+        ramType: "ddr5",
+        maxRam: 128,
+        maxRamSpeed: 6000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Стабильная поддержка 6000MHz"
+    },
+    "ASUS TUF Gaming B650-PLUS": {
+        ramType: "ddr5",
+        maxRam: 128,
+        maxRamSpeed: 6000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Стабильная поддержка 6000MHz"
+    },
+    "Gigabyte B650 AORUS Elite AX": {
+        ramType: "ddr5",
+        maxRam: 128,
+        maxRamSpeed: 6400,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка разгона до 6400MHz"
+    },
+    "Gigabyte B850 AORUS Master": {
+        ramType: "ddr5",
+        maxRam: 192,
+        maxRamSpeed: 8000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка высоких частот до 8000MHz"
+    },
+    "MSI X670E Carbon WiFi": {
+        ramType: "ddr5",
+        maxRam: 128,
+        maxRamSpeed: 6600,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка разгона до 6600MHz"
+    },
+    "MSI X870 Carbon WiFi": {
+        ramType: "ddr5",
+        maxRam: 192,
+        maxRamSpeed: 7800,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка высоких частот до 7800MHz"
+    },
+    "ASUS ROG Crosshair X870 Hero": {
+        ramType: "ddr5",
+        maxRam: 192,
+        maxRamSpeed: 8000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка высоких частот до 8000MHz"
+    },
+    "ASUS ROG Crosshair X870E Extreme": {
+        ramType: "ddr5",
+        maxRam: 192,
+        maxRamSpeed: 8000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Поддержка высоких частот до 8000MHz, 2 DIMM на канал"
+    },
+    "MSI X870E Godlike": {
+        ramType: "ddr5",
+        maxRam: 256,
+        maxRamSpeed: 8000,
+        dualChannel: true,
+        slots: 4,
+        warnings: "Максимальная поддержка памяти 256GB"
+    }
+};
+
+// Функция получения чипсета из названия материнской платы
+function extractChipset(motherboardName) {
+    motherboardName = motherboardName.toLowerCase();
+    
+    if (motherboardName.includes('h610')) return 'h610';
+    if (motherboardName.includes('b660')) return 'b660';
+    if (motherboardName.includes('h670')) return 'h670';
+    if (motherboardName.includes('z690')) return 'z690';
+    if (motherboardName.includes('b760')) return 'b760';
+    if (motherboardName.includes('z790')) return 'z790';
+    if (motherboardName.includes('z890')) return 'z890';
+    if (motherboardName.includes('b860')) return 'b860';
+    if (motherboardName.includes('h810')) return 'h810';
+    
+    if (motherboardName.includes('a520')) return 'a520';
+    if (motherboardName.includes('b450')) return 'b450';
+    if (motherboardName.includes('b550')) return 'b550';
+    if (motherboardName.includes('x470')) return 'x470';
+    if (motherboardName.includes('x570')) return 'x570';
+    
+    if (motherboardName.includes('a620')) return 'a620';
+    if (motherboardName.includes('b650')) return 'b650';
+    if (motherboardName.includes('b650e')) return 'b650e';
+    if (motherboardName.includes('x670')) return 'x670';
+    if (motherboardName.includes('x670e')) return 'x670e';
+    if (motherboardName.includes('b850')) return 'b850';
+    if (motherboardName.includes('x870')) return 'x870';
+    if (motherboardName.includes('x870e')) return 'x870e';
+    
+    return 'unknown';
+}
+
+// Функция проверки совместимости процессора и материнской платы
+function checkCPUMotherboardCompatibility(cpuName, motherboardName, motherboardSocket) {
+    
+    const cpuData = compatibilityDB[cpuName];
+    if (!cpuData) {
+        return { compatible: true, message: "Нет данных о совместимости" };
+    }
+    
+    // 1. Проверка сокета
+    if (cpuData.socket !== motherboardSocket) {
+        return { 
+            compatible: false, 
+            message: `❌ Несовместимые сокеты: процессор ${cpuData.socket}, плата ${motherboardSocket}` 
+        };
+    }
+    
+    // 2. Получаем чипсет платы
+    const chipset = extractChipset(motherboardName);
+    
+    // 3. Проверка минимального чипсета
+    if (!cpuData.minChipset.includes(chipset)) {
+        return { 
+            compatible: false, 
+            message: `❌ Чипсет ${chipset.toUpperCase()} не поддерживает этот процессор. Требуется один из: ${cpuData.minChipset.join(', ').toUpperCase()}` 
+        };
+    }
+    
+    // 4. Проверка версии BIOS
+    let warnings = [];
+    if (cpuData.biosVersion && cpuData.biosVersion[chipset] && cpuData.biosVersion[chipset] !== 'any') {
+        warnings.push(`⚠️ Требуется версия BIOS ${cpuData.biosVersion[chipset]} или новее`);
+    }
+    
+    // 5. Добавляем специфические предупреждения для данного чипсета
+    if (cpuData.warnings && cpuData.warnings[chipset]) {
+        warnings.push(`⚠️ ${cpuData.warnings[chipset]}`);
+    }
+    
+    // 6. Проверка TDP для слабых плат
+    if (cpuData.tdp > 105 && (chipset === 'h610' || chipset === 'a520' || chipset === 'a620')) {
+        warnings.push(`⚠️ Высокий TDP (${cpuData.tdp}W) может быть проблемой для этой платы`);
+    }
+    
+    // 7. Для K-процессоров на не-Z чипсетах
+    if (cpuData.requiresK && !chipset.startsWith('z') && !chipset.includes('x')) {
+        warnings.push(`⚠️ Процессор с разблокированным множителем, но разгон недоступен на этом чипсете`);
+    }
+    
+    if (warnings.length > 0) {
+        return { compatible: true, message: warnings.join('\n') };
+    }
+    
+    return { compatible: true, message: "✅ Полная совместимость" };
+}
+
+// Функция проверки совместимости RAM с процессором
+function checkRAMCPUCompatibility(ramElement, cpuName) {
+    const cpuData = cpuRAMDB[cpuName];
+    if (!cpuData) {
+        return { compatible: true, message: "Нет данных о совместимости" };
+    }
+    
+    const ramType = ramElement.dataset.ramType;
+    const ramSpeed = parseInt(ramElement.dataset.ramSpeed);
+    const ramSize = parseInt(ramElement.dataset.ramSize);
+    
+    let warnings = [];
+    
+    // 1. Проверка типа RAM
+    if (ramType !== cpuData.ramType) {
+        return { 
+            compatible: false, 
+            message: `❌ Несовместимый тип памяти: процессор поддерживает ${cpuData.ramType.toUpperCase()}, выбрана ${ramType.toUpperCase()}` 
+        };
+    }
+    
+    // 2. Проверка максимального объема
+    if (ramSize > cpuData.maxRam) {
+        return { 
+            compatible: false, 
+            message: `❌ Превышен максимальный объем памяти: процессор поддерживает до ${cpuData.maxRam}GB, выбрано ${ramSize}GB` 
+        };
+    }
+    
+    // 3. Проверка минимальной частоты
+    if (ramSpeed < cpuData.minRamSpeed) {
+        return { 
+            compatible: false, 
+            message: `❌ Частота памяти (${ramSpeed}MHz) ниже минимальной поддерживаемой (${cpuData.minRamSpeed}MHz)` 
+        };
+    }
+    
+    // 4. Проверка максимальной частоты
+    if (ramSpeed > cpuData.maxRamSpeed) {
+        warnings.push(`⚠️ Частота памяти (${ramSpeed}MHz) превышает официальную (${cpuData.maxRamSpeed}MHz). Может работать нестабильно или понижать частоту`);
+    }
+    
+    // 5. Добавляем специфические предупреждения
+    if (cpuData.warnings) {
+        if (cpuData.warnings.highSpeed && ramSpeed > cpuData.maxRamSpeed) {
+            warnings.push(`⚠️ ${cpuData.warnings.highSpeed}`);
+        }
+        if (cpuData.warnings.sweetSpot) {
+            warnings.push(`💡 ${cpuData.warnings.sweetSpot}`);
+        }
+    }
+    
+    // 6. Проверка оптимальной частоты для разных платформ
+    if (cpuName.includes('7800X3D') && ramSpeed !== 6000) {
+        warnings.push(`💡 Для Ryzen 7 7800X3D оптимальна частота 6000MHz`);
+    }
+    if (cpuName.includes('9800X3D') && ramSpeed !== 6000) {
+        warnings.push(`💡 Для Ryzen 7 9800X3D оптимальна частота 6000MHz`);
+    }
+    if (cpuName.includes('Intel Core i') && cpuName.includes('14') && ramSpeed < 5600) {
+        warnings.push(`💡 Для 14-го поколения Intel рекомендуется DDR5 5600MHz или выше`);
+    }
+    
+    if (warnings.length > 0) {
+        return { compatible: true, message: warnings.join('\n') };
+    }
+    
+    return { compatible: true, message: "✅ Полная совместимость с процессором" };
+}
+
+// Функция проверки совместимости RAM с материнской платой
+function checkRAMMotherboardCompatibility(ramElement, motherboardName) {
+    const motherboardData = motherboardRAMDB[motherboardName];
+    if (!motherboardData) {
+        return { compatible: true, message: "Нет данных о совместимости" };
+    }
+    
+    const ramType = ramElement.dataset.ramType;
+    const ramSpeed = parseInt(ramElement.dataset.ramSpeed);
+    const ramSize = parseInt(ramElement.dataset.ramSize);
+    
+    let warnings = [];
+    
+    // 1. Проверка типа RAM
+    if (ramType !== motherboardData.ramType) {
+        return { 
+            compatible: false, 
+            message: `❌ Несовместимый тип памяти: плата поддерживает ${motherboardData.ramType.toUpperCase()}, выбрана ${ramType.toUpperCase()}` 
+        };
+    }
+    
+    // 2. Проверка максимального объема
+    if (ramSize > motherboardData.maxRam) {
+        return { 
+            compatible: false, 
+            message: `❌ Превышен максимальный объем памяти: плата поддерживает до ${motherboardData.maxRam}GB, выбрано ${ramSize}GB` 
+        };
+    }
+    
+    // 3. Проверка максимальной частоты
+    if (ramSpeed > motherboardData.maxRamSpeed) {
+        warnings.push(`⚠️ Частота памяти (${ramSpeed}MHz) превышает максимальную поддерживаемую (${motherboardData.maxRamSpeed}MHz). Память будет работать на меньшей частоте`);
+    }
+    
+    // 4. Проверка двухканального режима
+    if (motherboardData.slots === 2 && ramSize > 32) {
+        warnings.push(`⚠️ На плате всего 2 слота, для двухканального режима потребуется 2 планки`);
+    }
+    
+    // 5. Специфические предупреждения для данной платы
+    if (motherboardData.warnings) {
+        warnings.push(`ℹ️ ${motherboardData.warnings}`);
+    }
+    
+    if (warnings.length > 0) {
+        return { compatible: true, message: warnings.join('\n') };
+    }
+    
+    return { compatible: true, message: "✅ Полная совместимость с материнской платой" };
+}
+// База данных видеокарт
+const gpuDB = {
+    // NVIDIA 30 series
+    "RTX 3050, 8 ГБ GDDR6": {
+        tdp: 130,
+        length: 242,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 450,
+        warnings: "Бюджетная видеокарта, не требует мощного БП"
+    },
+    "RTX 3060, 12 ГБ GDDR6": {
+        tdp: 170,
+        length: 242,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 550,
+        warnings: "Хороший выбор для 1080p"
+    },
+    "RTX 3060 Ti, 8 ГБ GDDR6": {
+        tdp: 200,
+        length: 242,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 600,
+        warnings: "Требует качественный БП"
+    },
+    "RTX 3070, 8 ГБ GDDR6X": {
+        tdp: 220,
+        length: 242,
+        slots: 2,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 650,
+        warnings: "Рекомендуется БП 650W+"
+    },
+    "RTX 3070 Ti, 16 ГБ GDDR6X": {
+        tdp: 290,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 750,
+        warnings: "Высокое энергопотребление"
+    },
+    "RTX 3080, 10 ГБ GDDR6X": {
+        tdp: 320,
+        length: 285,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 750,
+        warnings: "Требуется хороший БП и корпус"
+    },
+    "RTX 3080 Ti, 12 ГБ GDDR6X": {
+        tdp: 350,
+        length: 285,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 850,
+        warnings: "Очень требовательна к питанию"
+    },
+    "RTX 3090, 24 ГБ GDDR6X": {
+        tdp: 350,
+        length: 313,
+        slots: 3,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 850,
+        warnings: "Огромная карта, проверьте корпус!"
+    },
+    
+    // NVIDIA 40 series
+    "RTX 4060, 12 ГБ GDDR6X": {
+        tdp: 115,
+        length: 242,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 500,
+        warnings: "Энергоэффективная карта"
+    },
+    "RTX 4070, 12 ГБ GDDR6X": {
+        tdp: 200,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8-pin",
+        recommendedPSU: 650,
+        warnings: "Отличный выбор для 1440p"
+    },
+    "RTX 4080, 16 ГБ GDDR6X": {
+        tdp: 320,
+        length: 304,
+        slots: 3,
+        powerConnectors: "12VHPWR",
+        recommendedPSU: 750,
+        warnings: "Требуется новый разъем 12VHPWR или переходник"
+    },
+    "RTX 4090, 24 ГБ GDDR6X": {
+        tdp: 450,
+        length: 336,
+        slots: 4,
+        powerConnectors: "12VHPWR",
+        recommendedPSU: 1000,
+        warnings: "Максимальные требования к питанию и корпусу!"
+    },
+    
+    // NVIDIA 50 series
+    "RTX 5060, 8 ГБ GDDR7": {
+        tdp: 150,
+        length: 250,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 550,
+        warnings: "Новое поколение, энергоэффективно"
+    },
+    "RTX 5060 Ti, 16 ГБ GDDR7": {
+        tdp: 180,
+        length: 260,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 600,
+        warnings: "Хороший выбор для 1440p"
+    },
+    "RTX 5070, 12 ГБ GDDR7": {
+        tdp: 220,
+        length: 280,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 650,
+        warnings: "Сбалансированное решение"
+    },
+    "RTX 5070 Ti, 16 ГБ GDDR7": {
+        tdp: 300,
+        length: 300,
+        slots: 3,
+        powerConnectors: "12VHPWR",
+        recommendedPSU: 750,
+        warnings: "Требуется современный БП"
+    },
+    "RTX 5080, 16 ГБ GDDR7": {
+        tdp: 360,
+        length: 320,
+        slots: 3,
+        powerConnectors: "12VHPWR",
+        recommendedPSU: 850,
+        warnings: "Высокопроизводительная карта"
+    },
+    "RTX 5090, 32 ГБ GDDR7": {
+        tdp: 500,
+        length: 350,
+        slots: 4,
+        powerConnectors: "12VHPWR",
+        recommendedPSU: 1200,
+        warnings: "Экстремальные требования ко всем компонентам!"
+    },
+    
+    // AMD Radeon
+    "RX 6600, 8 ГБ GDDR6": {
+        tdp: 132,
+        length: 240,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 500,
+        warnings: "Бюджетный вариант"
+    },
+    "RX 6600 XT, 8 ГБ GDDR6": {
+        tdp: 160,
+        length: 240,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 550,
+        warnings: "Хороша для 1080p"
+    },
+    "RX 6700 XT, 12 ГБ GDDR6": {
+        tdp: 230,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 650,
+        warnings: "Конкурент RTX 3070"
+    },
+    "RX 6800, 16 ГБ GDDR6": {
+        tdp: 250,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 700,
+        warnings: "Много видеопамяти"
+    },
+    "RX 6800 XT, 16 ГБ GDDR6": {
+        tdp: 300,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 750,
+        warnings: "Требовательна к питанию"
+    },
+    "RX 6900 XT, 16 ГБ GDDR6": {
+        tdp: 330,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 850,
+        warnings: "Флагман предыдущего поколения"
+    },
+    "RX 7600, 8 ГБ GDDR6": {
+        tdp: 165,
+        length: 240,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 550,
+        warnings: "Бюджетный выбор"
+    },
+    "RX 7700 XT, 12 ГБ GDDR6": {
+        tdp: 245,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 700,
+        warnings: "Хороший вариант для 1440p"
+    },
+    "RX 7800 XT, 16 ГБ GDDR6": {
+        tdp: 263,
+        length: 267,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 700,
+        warnings: "Отличное соотношение цены и производительности"
+    },
+    "RX 7900 XTX, 24 ГБ GDDR6": {
+        tdp: 355,
+        length: 287,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 850,
+        warnings: "Флагман AMD"
+    },
+    "RX 9060 XT, 16 ГБ GDDR6": {
+        tdp: 200,
+        length: 250,
+        slots: 2,
+        powerConnectors: "8-pin",
+        recommendedPSU: 600,
+        warnings: "Новое поколение"
+    },
+    "RX 9070, 16 ГБ GDDR6": {
+        tdp: 260,
+        length: 280,
+        slots: 2.5,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 750,
+        warnings: "Средний сегмент"
+    },
+    "RX 9070 XT, 16 ГБ GDDR6": {
+        tdp: 300,
+        length: 300,
+        slots: 3,
+        powerConnectors: "8+8-pin",
+        recommendedPSU: 800,
+        warnings: "Производительное решение"
+    }
+};
+
+// База данных корпусов
+const caseDB = {
+    "NZXT H510": {
+        maxGpuLength: 381,
+        maxCoolerHeight: 165,
+        maxPsuLength: 200,
+        formFactor: ["atx", "micro-atx", "mini-itx"],
+        gpuSlots: 7,
+        warnings: "Популярный корпус, хорошая совместимость"
+    },
+    "Corsair 4000D": {
+        maxGpuLength: 360,
+        maxCoolerHeight: 170,
+        maxPsuLength: 225,
+        formFactor: ["atx", "micro-atx", "mini-itx"],
+        gpuSlots: 7,
+        warnings: "Отличная вентиляция"
+    },
+    "Lian Li O11": {
+        maxGpuLength: 420,
+        maxCoolerHeight: 155,
+        maxPsuLength: 210,
+        formFactor: ["atx", "micro-atx", "mini-itx"],
+        gpuSlots: 7,
+        warnings: "Для СЖО, ограничение по высоте кулера"
+    }
+};
+
+// База данных блоков питания
+const psuDB = {
+    "600W Bronze": {
+        wattage: 600,
+        cpuConnectors: "4+4-pin",
+        pcieConnectors: "2x 6+2-pin",
+        sataConnectors: 6,
+        warnings: "Базовый БП, хватит для средних сборок"
+    },
+    "750W Gold": {
+        wattage: 750,
+        cpuConnectors: "2x 4+4-pin",
+        pcieConnectors: "4x 6+2-pin",
+        sataConnectors: 8,
+        warnings: "Золотой стандарт для большинства сборок"
+    },
+    "850W Gold": {
+        wattage: 850,
+        cpuConnectors: "2x 4+4-pin",
+        pcieConnectors: "6x 6+2-pin",
+        sataConnectors: 12,
+        warnings: "Для мощных видеокарт и разгона"
+    }
+};
+
+// База данных охлаждения
+const coolerDB = {
+    "Воздушное Cooler Master": {
+        type: "air",
+        height: 155,
+        tdp: 150,
+        socket: ["lga1700", "am4", "am5"],
+        warnings: "Бюджетное решение"
+    },
+    "Воздушное Noctua": {
+        type: "air",
+        height: 158,
+        tdp: 200,
+        socket: ["lga1700", "am4", "am5"],
+        warnings: "Качественное охлаждение"
+    },
+    "Жидкостное 240mm": {
+        type: "liquid",
+        radiatorSize: 240,
+        tdp: 250,
+        socket: ["lga1700", "am4", "am5"],
+        warnings: "Требует места в корпусе для радиатора"
+    },
+    "Жидкостное 360mm": {
+        type: "liquid",
+        radiatorSize: 360,
+        tdp: 350,
+        socket: ["lga1700", "am4", "am5"],
+        warnings: "Для мощных процессоров, нужен большой корпус"
+    }
+};
+
+// База данных SSD
+const ssdDB = {
+    "500GB NVMe": {
+        type: "nvme",
+        capacity: 500,
+        interface: "pcie3",
+        warnings: "Базовый NVMe"
+    },
+    "1TB NVMe": {
+        type: "nvme",
+        capacity: 1000,
+        interface: "pcie3",
+        warnings: "Оптимальный объем"
+    },
+    "2TB NVMe": {
+        type: "nvme",
+        capacity: 2000,
+        interface: "pcie3",
+        warnings: "Для больших игр"
+    },
+    "1TB SATA": {
+        type: "sata",
+        capacity: 1000,
+        interface: "sata3",
+        warnings: "Медленнее NVMe, но совместим со старыми платами"
+    },
+    "2TB SATA": {
+        type: "sata",
+        capacity: 2000,
+        interface: "sata3",
+        warnings: "Большой объем на SATA"
+    }
+};
+// Функция обновления совместимости материнских плат при выборе CPU
+function updateMotherboardCompatibility() {
+    const cpuOption = document.querySelector('.option[data-type="cpu"].selected');
+    if (!cpuOption) return;
+    
+    const cpuName = cpuOption.childNodes[0].textContent.trim();
+    
+    const motherboardOptions = document.querySelectorAll('.option[data-type="motherboard"]');
+    
+    motherboardOptions.forEach(mb => {
+        const mbName = mb.childNodes[0].textContent.trim();
+        const mbSocket = mb.dataset.socket;
+        
+        const result = checkCPUMotherboardCompatibility(cpuName, mbName, mbSocket);
+        
+        if (!result.compatible) {
+            mb.classList.add('incompatible');
+            mb.style.pointerEvents = 'none';
+            mb.title = result.message;
+            
+            if (mb.classList.contains('selected')) {
+                mb.classList.remove('selected');
+                delete build["материнская плата"];
+                updateSummary();
+            }
+        } else {
+            mb.classList.remove('incompatible');
+            mb.style.pointerEvents = 'auto';
+            mb.title = result.message;
+        }
+    });
+    updatePartHeaders();
+}
+
+// Функция обновления совместимости RAM
+function updateRAMCompatibility() {
+    const cpuOption = document.querySelector('.option[data-type="cpu"].selected');
+    const motherboardOption = document.querySelector('.option[data-type="motherboard"].selected');
+    
+    const ramOptions = document.querySelectorAll('.option[data-type="ram"]');
+    
+    ramOptions.forEach(ram => {
+        let compatible = true;
+        let allWarnings = [];
+        
+        // Проверка с CPU
+        if (cpuOption) {
+            const cpuName = cpuOption.childNodes[0].textContent.trim();
+            const cpuResult = checkRAMCPUCompatibility(ram, cpuName);
+            
+            if (!cpuResult.compatible) {
+                compatible = false;
+            } else if (cpuResult.message !== "✅ Полная совместимость с процессором") {
+                allWarnings.push("CPU: " + cpuResult.message);
+            }
+        }
+        
+        // Проверка с материнской платой
+        if (motherboardOption && compatible) {
+            const mbName = motherboardOption.childNodes[0].textContent.trim();
+            const mbResult = checkRAMMotherboardCompatibility(ram, mbName);
+            
+            if (!mbResult.compatible) {
+                compatible = false;
+            } else if (mbResult.message !== "✅ Полная совместимость с материнской платой") {
+                allWarnings.push("MB: " + mbResult.message);
+            }
+        }
+        
+        if (compatible) {
+            ram.classList.remove('incompatible');
+            ram.style.pointerEvents = 'auto';
+            ram.title = allWarnings.join(' | ');
+        } else {
+            ram.classList.add('incompatible');
+            ram.style.pointerEvents = 'none';
+            ram.title = 'Несовместимо';
+            
+            if (ram.classList.contains('selected')) {
+                ram.classList.remove('selected');
+                delete build["оперативная память"];
+                updateSummary();
+            }
+        }
+    });
+    updatePartHeaders();
+}
+// Функция проверки совместимости видеокарты с БП
+function checkGPUPSUCompatibility(gpuName, psuName) {
+    const gpuData = gpuDB[gpuName];
+    const psuData = psuDB[psuName];
+    
+    if (!gpuData || !psuData) return { compatible: true, message: "" };
+    
+    let warnings = [];
+    
+    // Проверка мощности
+    if (psuData.wattage < gpuData.recommendedPSU) {
+        return {
+            compatible: false,
+            message: `❌ БП ${psuData.wattage}W недостаточно для ${gpuName}. Рекомендуется ${gpuData.recommendedPSU}W`
+        };
+    }
+    
+    // Проверка разъемов питания
+    if (gpuData.powerConnectors === "12VHPWR" && !psuName.includes("Gold")) {
+        warnings.push(`⚠️ Для ${gpuName} требуется разъем 12VHPWR. Убедитесь, что БП имеет такой разъем или используйте переходник`);
+    }
+    
+    if (gpuData.powerConnectors === "8+8-pin" && psuData.pcieConnectors < 2) {
+        warnings.push(`⚠️ Для ${gpuName} требуется 2 разъема PCIe`);
+    }
+    
+    if (warnings.length > 0) {
+        return { compatible: true, message: warnings.join('\n') };
+    }
+    
+    return { compatible: true, message: "✅ БП совместим с видеокартой" };
+}
+
+// Функция проверки совместимости видеокарты с корпусом
+function checkGPUCaseCompatibility(gpuName, caseName) {
+    const gpuData = gpuDB[gpuName];
+    const caseData = caseDB[caseName];
+    
+    if (!gpuData || !caseData) return { compatible: true, message: "" };
+    
+    let warnings = [];
+    
+    // Проверка длины
+    if (gpuData.length > caseData.maxGpuLength) {
+        return {
+            compatible: false,
+            message: `❌ Видеокарта длиной ${gpuData.length}мм не поместится в корпус (макс. ${caseData.maxGpuLength}мм)`
+        };
+    }
+    
+    // Проверка количества слотов
+    if (gpuData.slots > caseData.gpuSlots) {
+        warnings.push(`⚠️ Видеокарта занимает ${gpuData.slots} слота, в корпусе ${caseData.gpuSlots} слотов`);
+    }
+    
+    if (warnings.length > 0) {
+        return { compatible: true, message: warnings.join('\n') };
+    }
+    
+    return { compatible: true, message: "✅ Видеокарта помещается в корпус" };
+}
+
+// Функция проверки совместимости кулера с корпусом
+function checkCoolerCaseCompatibility(coolerName, caseName) {
+    const coolerData = coolerDB[coolerName];
+    const caseData = caseDB[caseName];
+    
+    if (!coolerData || !caseData) return { compatible: true, message: "" };
+    
+    // Воздушное охлаждение
+    if (coolerData.type === "air") {
+        if (coolerData.height > caseData.maxCoolerHeight) {
+            return {
+                compatible: false,
+                message: `❌ Высота кулера ${coolerData.height}мм превышает макс. для корпуса (${caseData.maxCoolerHeight}мм)`
+            };
+        }
+    }
+    
+    // Жидкостное охлаждение
+    if (coolerData.type === "liquid") {
+        if (coolerData.radiatorSize > 360) {
+            return {
+                compatible: false,
+                message: `❌ Радиатор ${coolerData.radiatorSize}мм может не поместиться в корпус`
+            };
+        }
+    }
+    
+    return { compatible: true, message: "✅ Охлаждение совместимо с корпусом" };
+}
+
+// Функция проверки совместимости кулера с процессором
+function checkCoolerCPUCompatibility(coolerName, cpuName, cpuSocket) {
+    const coolerData = coolerDB[coolerName];
+    
+    if (!coolerData) return { compatible: true, message: "" };
+    
+    // Проверка сокета
+    if (!coolerData.socket.includes(cpuSocket)) {
+        return {
+            compatible: false,
+            message: `❌ Кулер не поддерживает сокет ${cpuSocket}`
+        };
+    }
+    
+    // Получаем TDP процессора из compatibilityDB
+    const cpuData = compatibilityDB[cpuName];
+    if (cpuData && cpuData.tdp > coolerData.tdp) {
+        return {
+            compatible: false,
+            message: `❌ TDP процессора (${cpuData.tdp}W) превышает возможности кулера (${coolerData.tdp}W)`
+        };
+    }
+    
+    return { compatible: true, message: "✅ Кулер совместим с процессором" };
+}
+
+// Функция проверки совместимости SSD с материнской платой
+function checkSSDMotherboardCompatibility(ssdName, motherboardName) {
+    const ssdData = ssdDB[ssdName];
+    
+    if (!ssdData) return { compatible: true, message: "" };
+    
+    // Здесь можно добавить проверку наличия M.2 слотов на конкретной плате
+    // Пока просто предупреждение для SATA
+    if (ssdData.type === "sata") {
+        return { compatible: true, message: "ℹ️ SATA SSD работает на всех платах, но медленнее NVMe" };
+    }
+    
+    return { compatible: true, message: "✅ SSD совместим" };
+}
+
+// Функция расчета общего энергопотребления
+function calculateTotalPower() {
+    let total = 0;
+    
+    // Процессор
+    if (build["процессор"]) {
+        const cpuName = build["процессор"].name;
+        const cpuData = compatibilityDB[cpuName];
+        if (cpuData) total += cpuData.tdp;
+    }
+    
+    // Видеокарта
+    if (build["видеокарта"]) {
+        const gpuName = build["видеокарта"].name;
+        const gpuData = gpuDB[gpuName];
+        if (gpuData) total += gpuData.tdp;
+    }
+    
+    // Добавляем запас на остальные компоненты
+    total += 100; // мать, SSD, вентиляторы
+    
+    return total;
+}
+
+// Обновленная функция проверки БП
+function checkPSUSufficiency(psuName) {
+    const psuData = psuDB[psuName];
+    if (!psuData) return { compatible: true, message: "" };
+    
+    const totalPower = calculateTotalPower();
+    const recommendedMin = totalPower * 1.2; // запас 20%
+    
+    if (psuData.wattage < totalPower) {
+        return {
+            compatible: false,
+            message: `❌ БП ${psuData.wattage}W недостаточно! Системе нужно минимум ${totalPower}W`
+        };
+    }
+    
+    if (psuData.wattage < recommendedMin) {
+        return {
+            compatible: true,
+            message: `⚠️ БП ${psuData.wattage}W на грани. Рекомендуется ${Math.ceil(recommendedMin)}W для запаса`
+        };
+    }
+    
+    return { compatible: true, message: "✅ БП достаточно" };
+}
+// Выбор компонента
+document.querySelectorAll(".option").forEach(opt => {
+    opt.onclick = (e) => {
+        e.stopPropagation();
+        
+        if (opt.classList.contains('incompatible')) return;
+        
+        const partHeader = opt.closest(".part").querySelector(".part-header");
+        if (!partHeader) return;
+        
+        const type = partHeader.innerText.toLowerCase();
+        const name = opt.childNodes[0].textContent.trim();
+        const price = parseInt(opt.dataset.price);
+        
+        // Проверка совместимости CPU и материнской платы
+        if (type === "материнская плата" && build["процессор"]) {
+            const cpuName = build["процессор"].name;
+            const mbSocket = opt.dataset.socket;
+            
+            const result = checkCPUMotherboardCompatibility(cpuName, name, mbSocket);
+            
+            if (!result.compatible) {
+                alert(result.message);
+                return;
+            } else if (result.message !== "✅ Полная совместимость") {
+                if (!confirm(result.message + "\n\nВсё равно выбрать?")) {
+                    return;
+                }
+            }
+        }
+        
+        if (type === "процессор" && build["материнская плата"]) {
+            const cpuName = name;
+            const mbName = build["материнская плата"].name;
+            const mbSocket = build["материнская плата"].socket;
+            
+            const result = checkCPUMotherboardCompatibility(cpuName, mbName, mbSocket);
+            
+            if (!result.compatible) {
+                alert(result.message);
+                return;
+            } else if (result.message !== "✅ Полная совместимость") {
+                if (!confirm(result.message + "\n\nВсё равно выбрать?")) {
+                    return;
+                }
+            }
+        }
+        
+        // Проверка видеокарты с БП
+if (opt.dataset.type === 'gpu' && build["блок питания"]) {
+    const result = checkGPUPSUCompatibility(name, build["блок питания"].name);
+    if (!result.compatible) {
+        alert(result.message);
+        return;
+    } else if (result.message !== "✅ БП совместим с видеокартой") {
+        if (!confirm(result.message + "\n\nВсё равно выбрать?")) {
+            return;
+        }
+    }
+}
+
+// Проверка видеокарты с корпусом
+if (opt.dataset.type === 'gpu' && build["корпус"]) {
+    const result = checkGPUCaseCompatibility(name, build["корпус"].name);
+    if (!result.compatible) {
+        alert(result.message);
+        return;
+    } else if (result.message !== "✅ Видеокарта помещается в корпус") {
+        if (!confirm(result.message + "\n\nВсё равно выбрать?")) {
+            return;
+        }
+    }
+}
+
+// Проверка кулера с корпусом
+if (opt.dataset.type === 'cooling' && build["корпус"]) {
+    const result = checkCoolerCaseCompatibility(name, build["корпус"].name);
+    if (!result.compatible) {
+        alert(result.message);
+        return;
+    } else if (result.message !== "✅ Охлаждение совместимо с корпусом") {
+        if (!confirm(result.message + "\n\nВсё равно выбрать?")) {
+            return;
+        }
+    }
+}
+
+// Проверка кулера с процессором
+if (opt.dataset.type === 'cooling' && build["процессор"]) {
+    const cpuSocket = build["процессор"].socket || 
+        (compatibilityDB[build["процессор"].name] ? compatibilityDB[build["процессор"].name].socket : "unknown");
+    const result = checkCoolerCPUCompatibility(name, build["процессор"].name, cpuSocket);
+    if (!result.compatible) {
+        alert(result.message);
+        return;
+    } else if (result.message !== "✅ Кулер совместим с процессором") {
+        if (!confirm(result.message + "\n\nВсё равно выбрать?")) {
+            return;
+        }
+    }
+}
+
+// Проверка БП с общей системой
+if (opt.dataset.type === 'psu') {
+    const result = checkPSUSufficiency(name);
+    if (!result.compatible) {
+        alert(result.message);
+        return;
+    } else if (result.message !== "✅ БП достаточно") {
+        if (!confirm(result.message + "\n\nВсё равно выбрать?")) {
+            return;
+        }
+    }
+}
+        
+        // Сохраняем выбор
+        build[type] = { 
+            name, 
+            price,
+            socket: opt.dataset.socket
+        };
+        
+        // Снимаем выделение с других опций в этой категории
+        const optionsInCategory = opt.closest(".part-options").querySelectorAll(".option");
+        optionsInCategory.forEach(o => o.classList.remove("selected"));
+        opt.classList.add("selected");
+        
+        // Обновляем совместимость
+        if (opt.dataset.type === 'cpu') {
+            updateMotherboardCompatibility();
+            updateRAMCompatibility();
+        }
+        
+        if (opt.dataset.type === 'motherboard') {
+            updateRAMCompatibility();
+        }
+        
+        updateSummary();
+    }
+});
+// Подсветка выбранных разделов
+function updatePartHeaders() {
+    document.querySelectorAll(".part-header").forEach(header => {
+        const partType = header.innerText.toLowerCase();
+        if (build[partType]) {
+            header.classList.add("selected-part");
+        } else {
+            header.classList.remove("selected-part");
+        }
+    });
+}
+
+// Функция обновления суммы
+function updateSummary() {
+    let total = 0;
+    let text = "";
+    let warnings = [];
+    
+    for(let key in build){
+        if(build[key]){
+            // Для RAM показываем количество
+            if (key === "оперативная память" && build[key].quantity && build[key].quantity > 1) {
+                text += key + ": " + build[key].quantity + "x " + build[key].name + "<br>";
+            } else {
+                text += key + ": " + build[key].name + "<br>";
+            }
+            total += build[key].price * (build[key].quantity || 1);
+            
+            // Добавляем предупреждения
+            if (key === "видеокарта" && build["блок питания"]) {
+                const result = checkGPUPSUCompatibility(build["видеокарта"].name, build["блок питания"].name);
+                if (!result.compatible) warnings.push(result.message);
+            }
+            
+            if (key === "видеокарта" && build["корпус"]) {
+                const result = checkGPUCaseCompatibility(build["видеокарта"].name, build["корпус"].name);
+                if (!result.compatible) warnings.push(result.message);
+            }
+            
+            if (key === "охлаждение" && build["корпус"]) {
+                const result = checkCoolerCaseCompatibility(build["охлаждение"].name, build["корпус"].name);
+                if (!result.compatible) warnings.push(result.message);
+            }
+            
+            if (key === "охлаждение" && build["процессор"]) {
+                const cpuSocket = build["процессор"].socket || 
+                    (compatibilityDB[build["процессор"].name] ? compatibilityDB[build["процессор"].name].socket : "unknown");
+                const result = checkCoolerCPUCompatibility(build["охлаждение"].name, build["процессор"].name, cpuSocket);
+                if (!result.compatible) warnings.push(result.message);
+            }
+            
+            if (key === "блок питания") {
+                const result = checkPSUSufficiency(build["блок питания"].name);
+                if (!result.compatible) warnings.push(result.message);
+            }
+        }
+    }
+    
+    // Показываем предупреждения
+    if (warnings.length > 0) {
+        text += "<br><span style='color: #ffaa00; font-size: 12px;'>⚠️ " + warnings.join("<br>⚠️ ") + "</span>";
+    }
+    
+    document.getElementById("selected").innerHTML = text || "Выберите комплектующие";
+    document.querySelector(".total").innerHTML = total.toLocaleString() + " ₽";
+    
+    // Обновляем подсветку разделов
+    updatePartHeaders();
+}
+
+// Форматирование цены
+function formatPrice(price) {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
+}
+
+// Функция обновления кнопок RAM
+function updateRAMButtons(minusBtn, plusBtn, current, max) {
+    minusBtn.disabled = current <= 1;
+    plusBtn.disabled = current >= max;
+}
+
+// Логика для RAM с количеством
+document.querySelectorAll('.ram-base-option').forEach(option => {
+    option.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        const multiplierDiv = this.closest('.ram-multiplier');
+        const quantityDiv = multiplierDiv.querySelector('.ram-quantity');
+        const basePrice = parseInt(multiplierDiv.dataset.basePrice);
+        const ramType = multiplierDiv.dataset.ramType;
+        const ramSpeed = parseInt(multiplierDiv.dataset.ramSpeed);
+        const ramSize = parseInt(multiplierDiv.dataset.ramSize);
+        const maxMultiplier = parseInt(multiplierDiv.dataset.maxMultiplier);
+        const name = this.childNodes[0].textContent.trim();
+        
+        // Проверка совместимости
+        const cpuOption = document.querySelector('.option[data-type="cpu"].selected');
+        const motherboardOption = document.querySelector('.option[data-type="motherboard"].selected');
+        
+        // Создаем временный ram элемент для проверки
+        const tempRam = {
+            dataset: {
+                ramType: ramType,
+                ramSpeed: ramSpeed,
+                ramSize: ramSize
+            }
+        };
+        
+        // Проверка с CPU
+        if (cpuOption) {
+            const cpuName = cpuOption.childNodes[0].textContent.trim();
+            const cpuResult = checkRAMCPUCompatibility(tempRam, cpuName);
+            
+            if (!cpuResult.compatible) {
+                alert(cpuResult.message);
+                return;
+            } else if (cpuResult.message !== "✅ Полная совместимость с процессором") {
+                if (!confirm(cpuResult.message + "\n\nВсё равно выбрать?")) {
+                    return;
+                }
+            }
+        }
+        
+        // Проверка с материнской платой
+        if (motherboardOption) {
+            const mbName = motherboardOption.childNodes[0].textContent.trim();
+            const mbResult = checkRAMMotherboardCompatibility(tempRam, mbName);
+            
+            if (!mbResult.compatible) {
+                alert(mbResult.message);
+                return;
+            } else if (mbResult.message !== "✅ Полная совместимость с материнской платой") {
+                if (!confirm(mbResult.message + "\n\nВсё равно выбрать?")) {
+                    return;
+                }
+            }
+        }
+        
+        // Скрываем все другие quantity
+        document.querySelectorAll('.ram-quantity').forEach(q => q.style.display = 'none');
+        document.querySelectorAll('.ram-base-option').forEach(o => o.classList.remove('selected'));
+        
+        // Показываем quantity для выбранного
+        quantityDiv.style.display = 'flex';
+        this.classList.add('selected');
+        
+        // Сбрасываем количество
+        const quantityValue = quantityDiv.querySelector('.quantity-value');
+        const minusBtn = quantityDiv.querySelector('.minus');
+        const plusBtn = quantityDiv.querySelector('.plus');
+        const totalPriceSpan = quantityDiv.querySelector('.ram-total-price');
+        
+        quantityValue.textContent = '1';
+        totalPriceSpan.textContent = formatPrice(basePrice);
+        
+        // Обновляем кнопки
+        updateRAMButtons(minusBtn, plusBtn, 1, maxMultiplier);
+        
+        // Сохраняем в build
+        build["оперативная память"] = {
+            name: name,
+            price: basePrice,
+            quantity: 1,
+            ramType: ramType,
+            ramSpeed: ramSpeed,
+            ramSize: ramSize
+        };
+        
+        updateSummary();
+    });
+});
+
+// Обработчики для + и -
+document.querySelectorAll('.ram-quantity').forEach(div => {
+    const minusBtn = div.querySelector('.minus');
+    const plusBtn = div.querySelector('.plus');
+    const quantitySpan = div.querySelector('.quantity-value');
+    const totalPriceSpan = div.querySelector('.ram-total-price');
+    const multiplierDiv = div.closest('.ram-multiplier');
+    const basePrice = parseInt(multiplierDiv.dataset.basePrice);
+    const ramSize = parseInt(multiplierDiv.dataset.ramSize);
+    const maxMultiplier = parseInt(multiplierDiv.dataset.maxMultiplier);
+    
+    minusBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        let quantity = parseInt(quantitySpan.textContent);
+        if (quantity > 1) {
+            quantity--;
+            quantitySpan.textContent = quantity;
+            totalPriceSpan.textContent = formatPrice(basePrice * quantity);
+            
+            // Проверяем ограничения
+            let maxAllowed = maxMultiplier;
+            
+            // Проверка с CPU
+            const cpuOption = document.querySelector('.option[data-type="cpu"].selected');
+            if (cpuOption) {
+                const cpuName = cpuOption.childNodes[0].textContent.trim();
+                const cpuData = cpuRAMDB[cpuName];
+                if (cpuData && cpuData.maxRam) {
+                    const cpuMaxSticks = Math.floor(cpuData.maxRam / ramSize);
+                    maxAllowed = Math.min(maxAllowed, cpuMaxSticks);
+                }
+            }
+            
+            // Проверка с материнской платой
+            const motherboardOption = document.querySelector('.option[data-type="motherboard"].selected');
+            if (motherboardOption) {
+                const mbName = motherboardOption.childNodes[0].textContent.trim();
+                const mbData = motherboardRAMDB[mbName];
+                if (mbData && mbData.maxRam) {
+                    const mbMaxSticks = Math.floor(mbData.maxRam / ramSize);
+                    maxAllowed = Math.min(maxAllowed, mbMaxSticks);
+                }
+                if (mbData && mbData.slots) {
+                    maxAllowed = Math.min(maxAllowed, mbData.slots);
+                }
+            }
+            
+            updateRAMButtons(minusBtn, plusBtn, quantity, maxAllowed);
+            
+            // Обновляем build
+            if (build["оперативная память"]) {
+                build["оперативная память"].quantity = quantity;
+                updateSummary();
+            }
+        }
+    });
+    
+    plusBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        let quantity = parseInt(quantitySpan.textContent);
+        
+        // Проверяем ограничения по максимальному объему
+        let maxAllowed = maxMultiplier;
+        
+        // Проверка с CPU
+        const cpuOption = document.querySelector('.option[data-type="cpu"].selected');
+        if (cpuOption) {
+            const cpuName = cpuOption.childNodes[0].textContent.trim();
+            const cpuData = cpuRAMDB[cpuName];
+            if (cpuData && cpuData.maxRam) {
+                const cpuMaxSticks = Math.floor(cpuData.maxRam / ramSize);
+                maxAllowed = Math.min(maxAllowed, cpuMaxSticks);
+            }
+        }
+        
+        // Проверка с материнской платой
+        const motherboardOption = document.querySelector('.option[data-type="motherboard"].selected');
+        if (motherboardOption) {
+            const mbName = motherboardOption.childNodes[0].textContent.trim();
+            const mbData = motherboardRAMDB[mbName];
+            if (mbData && mbData.maxRam) {
+                const mbMaxSticks = Math.floor(mbData.maxRam / ramSize);
+                maxAllowed = Math.min(maxAllowed, mbMaxSticks);
+            }
+            if (mbData && mbData.slots) {
+                maxAllowed = Math.min(maxAllowed, mbData.slots);
+            }
+        }
+        
+        if (quantity < maxAllowed) {
+            quantity++;
+            quantitySpan.textContent = quantity;
+            totalPriceSpan.textContent = formatPrice(basePrice * quantity);
+            updateRAMButtons(minusBtn, plusBtn, quantity, maxAllowed);
+            
+            // Обновляем build
+            if (build["оперативная память"]) {
+                build["оперативная память"].quantity = quantity;
+                updateSummary();
+            }
+        } else {
+            alert(`Максимальное количество для этой памяти: ${maxAllowed} планок`);
+        }
+    });
+});
+
+// Инициализация
+setTimeout(() => {
+    updateRAMCompatibility();
+}, 100);
+</script>
+
+</body>
+</html>
